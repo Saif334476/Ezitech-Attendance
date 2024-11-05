@@ -119,7 +119,7 @@ class _SetupPasswordState extends State<SetupPassword> {
                           } else {
                             return null;
                           }
-                        },
+                        }, state: false
                       )),
                   Padding(
                     padding:
@@ -151,7 +151,7 @@ class _SetupPasswordState extends State<SetupPassword> {
                         } else {
                           return null;
                         }
-                      },
+                      }, state: false
                     ),
                   ),
                   Padding(

@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                            const ProfileCreationScreen()),
+                                             ProfileCreationScreen(userEmail: _phoneTextController.text,)),
                                             (route) => false,
                                       );
                                     } else if (role == 'Admin') {

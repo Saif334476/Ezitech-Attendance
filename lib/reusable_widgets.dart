@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 TextFormField textFormField(String text, IconData icon, bool obscuredText,
-    {required Function onChanged,
+    { required bool state,
+      required Function onChanged,
       required TextInputType keyboard,
       required TextEditingController controller,
       required String? Function(String?) validator,
@@ -24,6 +24,6 @@ TextFormField textFormField(String text, IconData icon, bool obscuredText,
         prefixIcon: Icon(icon)),
     validator: validator,
     controller: controller,
-
+    readOnly: state,
   );
 }
