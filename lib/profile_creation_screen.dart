@@ -23,9 +23,31 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
         padding: const EdgeInsets.only(top: 100.0),
         child: Column(
           children: [
-            CircleAvatar(
-              backgroundImage: AssetImage(selectedPhoto),
-              radius: 100,
+            Stack(
+              children: [
+                CircleAvatar(
+                  backgroundImage: AssetImage(selectedPhoto),
+                  radius: 100,
+                ),
+                Positioned(
+                  top:150,
+                  bottom: 0, // Position the button at the bottom of the CircleAvatar
+                  right: 20,  // Position it to the right of the CircleAvatar
+                  child: GestureDetector(
+                    onTap: () {
+                    },
+                    child: const CircleAvatar(
+                      radius: 20,  // Size of the edit button
+                      backgroundColor: Color(0xff62B01E), // Background color of the button
+                      child: Icon(
+                        Icons.edit, // Edit icon
+                        color: Colors.white,  // Icon color
+                        size: 20, // Icon size
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.only(top: 50.0, right: 20, left: 20),
@@ -39,7 +61,7 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                             borderSide: const BorderSide(color: Colors.red),
                             borderRadius: BorderRadius.circular(15)),
                         border: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xff1C4374)),
+                            borderSide: const BorderSide(color: Color(0xff62B01E)),
                             borderRadius: BorderRadius.circular(15)),
                         labelText: "Your E-mail",
                         prefixIcon: const Icon(Icons.email_outlined)),
