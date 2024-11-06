@@ -130,11 +130,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                               DateTime date = DateTime.now();
                               String formattedDate =
                                   DateFormat('dd-MM-yyyy').format(date);
+                              String format=DateFormat('MM').format(date);
                               FirebaseFirestore.instance
                                   .collection("Users")
                                   .doc(uId)
-                                  .collection("Attendance")
-                                  .doc(formattedDate)
+                                  .collection("Attendance").doc(format)
+                                  .collection(formattedDate).doc()
                                   .set({
                                 "Date": formattedDate,
                                 "Status": "Present"
