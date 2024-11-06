@@ -62,14 +62,22 @@ class _ViewAttendanceState extends State<ViewAttendance> {
             child: Text(
               "Please Select Month",
               style: TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-              ),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22,
+                  color: Colors.black),
             ),
           ),
           DropdownButton<String>(
+            dropdownColor: const Color(0xffd3edba),
+            icon: const Icon(
+              Icons.calendar_month_outlined,
+              color: Color(0xff62B01E),
+            ),
             value: _selectedItem, // The current selected item
-            hint: const Text("Select Month"), // Placeholder text
+            hint: const Text(
+              "Select Month",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ), // Placeholder text
             onChanged: (String? newValue) {
               setState(() {
                 _selectedItem = newValue; // Update the selected item
