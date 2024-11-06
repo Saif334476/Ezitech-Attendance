@@ -1,4 +1,4 @@
-import 'package:attendence_system/setup_password.dart';
+import 'package:attendence_system/student_screeens/setup_password.dart';
 import 'package:flutter/material.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/cupertino.dart';

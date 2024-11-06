@@ -1,6 +1,6 @@
-import 'package:attendence_system/admin_dashboard_screen.dart';
-import 'package:attendence_system/profile_creation_screen.dart';
-import 'package:attendence_system/student_dashboard_screen.dart';
+import 'package:attendence_system/admin_screens/admin_dashboard_screen.dart';
+import 'package:attendence_system/student_screeens/profile_creation_screen.dart';
+import 'package:attendence_system/student_screeens/student_dashboard_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
