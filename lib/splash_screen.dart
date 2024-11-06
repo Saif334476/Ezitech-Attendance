@@ -4,6 +4,7 @@ import 'package:attendence_system/student_screeens/student_dashboard_screen.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'login_screen.dart';
 
@@ -25,9 +26,14 @@ checkUser(String uId,context) async {
     final userEmail = data?['Email'];
 
     if (role == 'Student' && profileStatus == true) {
+
+      DateTime date = DateTime.now();
+      String formattedDate =
+      DateFormat('dd-MM-yyyy').format(date);
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const StudentDashboardScreen()),
+        MaterialPageRoute(builder: (context) =>  StudentDashboardScreen(alreadyMarked:formattedDate ,)),
       );
     }
     if (role == 'Student' && profileStatus == false) {

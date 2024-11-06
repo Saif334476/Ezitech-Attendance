@@ -135,9 +135,12 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                                   .update({
                                 'Name': _name.text,
                                 'GuardianName':_fatherName.text,
-                                'Phone':_phone.text
+                                'Phone':_phone.text,
+                                'isComplete':true
                               });
-        
+                            String? photoUrl= FirebaseAuth.instance.currentUser?.photoURL;
+
+
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
