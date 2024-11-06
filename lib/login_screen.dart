@@ -37,11 +37,20 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(children: <Widget>[
                 Padding(
-                    padding: const EdgeInsets.only(top: 90, bottom: 20),
+                    padding: const EdgeInsets.only(top: 70),
                     child: Image.asset("assets/logo.webp",
-                        width: 200, height: 200)),
+                        width: 150, height: 150)),
+                const Text(
+                  "Ezitech",
+                  style: TextStyle(
+                      fontFamily: 'Courier',
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.blueGrey),
+                  textAlign: TextAlign.center,
+                ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 15, right: 25, left: 25),
+                  padding: const EdgeInsets.only(top: 30, right: 25, left: 25),
                   child: TextFormField(
                     controller: _phoneTextController,
                     obscureText: false,
