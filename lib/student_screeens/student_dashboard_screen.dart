@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:attendence_system/login_screen.dart';
+import 'package:attendence_system/student_screeens/view_attendance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -180,7 +181,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           style: TextStyle(
                               fontWeight: FontWeight.w900, fontSize: 23),
                         ),
-                        onPressed: () {}),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ViewAttendance()));
+                        }),
                     const SizedBox(
                       height: 20,
                     ),
