@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
-  final String? alreadyMarked;
-  final String? month;
+  final String? formattedYear;
+  final String? formattedMonth;
   const StudentDashboardScreen({
     super.key,
-    this.alreadyMarked,
-    this.month,
+    this.formattedYear,
+    this.formattedMonth,
   });
 
   @override
@@ -28,13 +28,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   String _currentTime = '';
   final uId = FirebaseAuth.instance.currentUser?.uid;
   bool marked = false;
-  checkStatus() async {
+  checkStatus(String doc) async {
     DocumentReference docRef = FirebaseFirestore.instance
         .collection("Users")
-        .doc(uId)
-        .collection(widget.month!)
-        .doc(widget.alreadyMarked);
-
+        .doc(uId).collection("attendance")
+        .doc(doc);
     DocumentSnapshot snapshot = await docRef.get();
     if (snapshot.exists) {
       setState(() {
@@ -46,7 +44,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    checkStatus();
+    String doc='${widget.formattedMonth}-${widget.formattedYear}';
+    checkStatus(doc);
     _updateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _updateTime();
@@ -133,19 +132,23 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ? null
                           : () {
                               DateTime date = DateTime.now();
-                              final _formattedMonth = DateFormat('MMMM').format(date);
-                              final _formattedYear = DateFormat('yyyy').format(date);
-                              final _formattedday = DateFormat('d').format(date);
+                              final _formattedMonth =
+                                  DateFormat('MMMM').format(date);
+                              final _formattedYear =
+                                  DateFormat('yyyy').format(date);
+                              final _formattedday =
+                                  DateFormat('d').format(date);
                               formattedDate =
                                   DateFormat('dd-MM-yyyy').format(date);
                               format = DateFormat('MM').format(date);
                               currentMonth = fetchMonth(format);
                               FirebaseFirestore.instance
                                   .collection("Users")
-                                  .doc(uId).collection("attendance")
+                                  .doc(uId)
+                                  .collection("attendance")
                                   .doc('${_formattedMonth}-${_formattedYear}')
                                   .update({
-                                _formattedday:"Present",
+                                _formattedday: "Present",
                               });
 
                               setState(() {
