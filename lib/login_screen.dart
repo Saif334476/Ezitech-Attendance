@@ -194,13 +194,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                         DateTime date = DateTime.now();
                                         String formattedYear = DateFormat('yyyy').format(date);
                                         String formattedMonth = DateFormat('MMMM').format(date);
-
+                                        String formattedDay = DateFormat('d').format(date);
                                         //String monthNow = fetchMonth(format);
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) => StudentDashboardScreen(
-                                                  formattedYear: formattedYear, formattedMonth: formattedMonth)),
+                                                  formattedYear: formattedYear, formattedMonth: formattedMonth,formattedDay:formattedDay)),
                                         );
                                       } else if (role == 'Student' &&
                                           profileStatus == false) {

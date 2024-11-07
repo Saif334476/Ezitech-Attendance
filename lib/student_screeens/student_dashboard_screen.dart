@@ -10,10 +10,13 @@ import 'package:intl/intl.dart';
 class StudentDashboardScreen extends StatefulWidget {
   final String? formattedYear;
   final String? formattedMonth;
+  final String? formattedDay;
+
   const StudentDashboardScreen({
     super.key,
     this.formattedYear,
     this.formattedMonth,
+    this.formattedDay,
   });
 
   @override
@@ -28,23 +31,42 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   String _currentTime = '';
   final uId = FirebaseAuth.instance.currentUser?.uid;
   bool marked = false;
+  Map<String, dynamic>? _documents;
+  int _getDaysInMonth(int year, int month) {
+    DateTime firstDayNextMonth = DateTime(year, month + 1, 1);
+    DateTime lastDayCurrentMonth =
+        firstDayNextMonth.subtract(const Duration(days: 1));
+    return lastDayCurrentMonth.day;
+  }
+
   checkStatus(String doc) async {
-    DocumentReference docRef = FirebaseFirestore.instance
-        .collection("Users")
-        .doc(uId).collection("attendance")
-        .doc(doc);
-    DocumentSnapshot snapshot = await docRef.get();
-    if (snapshot.exists) {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uId)
+        .collection('attendance')
+        .doc(doc)
+        .snapshots()
+        .listen((snapshot) {
       setState(() {
-        marked = true;
+        if (snapshot.exists) {
+          _documents = snapshot.data()!;
+
+          String status = _documents![widget.formattedDay];
+          if(status=="Present"){
+        setState(() {
+          marked=true;
+        });}
+        } else {
+          marked=false;
+        }
       });
-    }
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    String doc='${widget.formattedMonth}-${widget.formattedYear}';
+    String doc = '${widget.formattedMonth}-${widget.formattedYear}';
     checkStatus(doc);
     _updateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -172,6 +194,26 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       onPressed: marked
                           ? null
                           : () {
+                              DateTime date = DateTime.now();
+                              final _formattedMonth =
+                                  DateFormat('MMMM').format(date);
+                              final _formattedYear =
+                                  DateFormat('yyyy').format(date);
+                              final _formattedday =
+                                  DateFormat('d').format(date);
+                              formattedDate =
+                                  DateFormat('dd-MM-yyyy').format(date);
+                              format = DateFormat('MM').format(date);
+                              currentMonth = fetchMonth(format);
+                              FirebaseFirestore.instance
+                                  .collection("Users")
+                                  .doc(uId)
+                                  .collection("attendance")
+                                  .doc('${_formattedMonth}-${_formattedYear}')
+                                  .update({
+                                _formattedday: "Leave Pending",
+                              });
+
                               setState(() {
                                 marked = true;
                               });
