@@ -50,14 +50,17 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       setState(() {
         if (snapshot.exists) {
           _documents = snapshot.data()!;
-
+print(widget.formattedDay);
           String status = _documents![widget.formattedDay];
-          if(status=="Present"){
+          if(status=="Present"|| status=="Leave Pending"){
         setState(() {
           marked=true;
         });}
         } else {
-          marked=false;
+          setState(() {
+            marked=false;
+          });
+
         }
       });
     });
