@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:attendence_system/login_screen.dart';
 import 'package:attendence_system/student_screeens/view_attendance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,9 +9,11 @@ import 'package:intl/intl.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   final String? alreadyMarked;
+  final String? month;
   const StudentDashboardScreen({
     super.key,
     this.alreadyMarked,
+    this.month,
   });
 
   @override
@@ -20,6 +21,9 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  String? formattedDate;
+  String? format;
+  String? currentMonth;
   late Timer _timer;
   String _currentTime = '';
   final uId = FirebaseAuth.instance.currentUser?.uid;
@@ -28,8 +32,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
     DocumentReference docRef = FirebaseFirestore.instance
         .collection("Users")
         .doc(uId)
-        .collection("Attendance")
+        .collection(widget.month!)
         .doc(widget.alreadyMarked);
+
     DocumentSnapshot snapshot = await docRef.get();
     if (snapshot.exists) {
       setState(() {
@@ -128,17 +133,19 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ? null
                           : () {
                               DateTime date = DateTime.now();
-                              String formattedDate =
+                              final _formattedMonth = DateFormat('MMMM').format(date);
+                              final _formattedYear = DateFormat('yyyy').format(date);
+                              final _formattedday = DateFormat('d').format(date);
+                              formattedDate =
                                   DateFormat('dd-MM-yyyy').format(date);
-                              String format=DateFormat('MM').format(date);
+                              format = DateFormat('MM').format(date);
+                              currentMonth = fetchMonth(format);
                               FirebaseFirestore.instance
                                   .collection("Users")
-                                  .doc(uId)
-                                  .collection("Attendance").doc(format)
-                                  .collection(formattedDate).doc()
-                                  .set({
-                                "Date": formattedDate,
-                                "Status": "Present"
+                                  .doc(uId).collection("attendance")
+                                  .doc('${_formattedMonth}-${_formattedYear}')
+                                  .update({
+                                _formattedday:"Present",
                               });
 
                               setState(() {
@@ -183,11 +190,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                               fontWeight: FontWeight.w900, fontSize: 23),
                         ),
                         onPressed: () {
+                          final DateTime now = DateTime.now();
+
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ViewAttendance()));
+                                  builder: (context) => ViewAttendance(
+                                        date: now,
+                                      )));
                         }),
                     const SizedBox(
                       height: 20,
@@ -213,4 +223,51 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           ),
         ));
   }
+}
+
+String fetchMonth(cMonth) {
+  String month = cMonth;
+  switch (month) {
+    case '1':
+      month = 'January';
+      break;
+    case '2':
+      month = 'February';
+      break;
+    case '3':
+      month = 'March';
+      break;
+    case '4':
+      month = 'April';
+      break;
+    case '5':
+      month = 'May';
+      break;
+    case '6':
+      month = 'June';
+      break;
+    case '7':
+      month = 'July';
+      break;
+    case '8':
+      month = 'August';
+      break;
+    case '9':
+      month = 'September';
+      break;
+    case '10':
+      month = 'October';
+      break;
+    case '11':
+      month = 'November';
+      break;
+    case '12':
+      month = 'December';
+      break;
+    default:
+      // Execute code if none of the cases match
+      break;
+  }
+
+  return month;
 }

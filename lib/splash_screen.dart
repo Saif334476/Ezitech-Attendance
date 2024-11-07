@@ -15,7 +15,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-checkUser(String uId,context) async {
+checkUser(String uId, context) async {
   final doc =
       await FirebaseFirestore.instance.collection('Users').doc(uId).get();
 
@@ -26,23 +26,26 @@ checkUser(String uId,context) async {
     final userEmail = data?['Email'];
 
     if (role == 'Student' && profileStatus == true) {
-
       DateTime date = DateTime.now();
-      String formattedDate =
-      DateFormat('dd-MM-yyyy').format(date);
-
+      String formattedDate = DateFormat('dd-MM-yyyy').format(date);
+      String format = DateFormat('MM').format(date);
+      String monthNow = fetchMonth(format);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) =>  StudentDashboardScreen(alreadyMarked:formattedDate ,)),
+        MaterialPageRoute(
+            builder: (context) => StudentDashboardScreen(
+                alreadyMarked: formattedDate, month: monthNow)),
       );
     }
     if (role == 'Student' && profileStatus == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => ProfileCreationScreen(userEmail: userEmail,)),
+            builder: (context) => ProfileCreationScreen(
+                  userEmail: userEmail,
+                )),
       );
-    }  else if (role == 'Admin') {
+    } else if (role == 'Admin') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
@@ -59,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final uId = user.uid;
-        checkUser(uId,context);
+        checkUser(uId, context);
       } else {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const LoginScreen()));
@@ -98,4 +101,51 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+}
+
+String fetchMonth(cMonth) {
+  String month = cMonth;
+  switch (month) {
+    case '1':
+      month = 'January';
+      break;
+    case '2':
+      month = 'February';
+      break;
+    case '3':
+      month = 'March';
+      break;
+    case '4':
+      month = 'April';
+      break;
+    case '5':
+      month = 'May';
+      break;
+    case '6':
+      month = 'June';
+      break;
+    case '7':
+      month = 'July';
+      break;
+    case '8':
+      month = 'August';
+      break;
+    case '9':
+      month = 'September';
+      break;
+    case '10':
+      month = 'October';
+      break;
+    case '11':
+      month = 'November';
+      break;
+    case '12':
+      month = 'December';
+      break;
+    default:
+      // Execute code if none of the cases match
+      break;
+  }
+
+  return month;
 }
