@@ -27,276 +27,270 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
-      child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-          ),
-          child: Form(
-              key: _formKey,
-              child: Column(children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.only(top: 70),
-                    child: Image.asset("assets/logo.webp",
-                        width: 150, height: 150)),
-                const Text(
-                  "Ezitech",
-                  style: TextStyle(
-                      fontFamily: 'Courier',
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.blueGrey),
-                  textAlign: TextAlign.center,
+      child: Form(
+          key: _formKey,
+          child: Column(children: <Widget>[
+            Padding(
+                padding: const EdgeInsets.only(top: 70),
+                child: Image.asset("assets/logo.webp",
+                    width: 150, height: 130)),
+            const Text(
+              "Ezitech",
+              style: TextStyle(
+                  fontFamily: 'Courier',
+                  fontSize: 33,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.blueGrey),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 60, right: 25, left: 25),
+              child: TextFormField(
+                controller: _phoneTextController,
+                obscureText: false,
+                decoration: InputDecoration(
+                  errorStyle: const TextStyle(color: Colors.red),
+                  errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.red),
+                      borderRadius: BorderRadius.circular(15)),
+                  border: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Color(0xff62B01E)),
+                      borderRadius: BorderRadius.circular(15)),
+                  labelText: "Enter your E-mail",
+                  prefixIcon: const Icon(
+                    Icons.email_outlined,
+                    color: Colors.black,
+                  ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 30, right: 25, left: 25),
-                  child: TextFormField(
-                    controller: _phoneTextController,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                      errorStyle: const TextStyle(color: Colors.red),
-                      errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.red),
-                          borderRadius: BorderRadius.circular(15)),
-                      border: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xff62B01E)),
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Enter your E-mail",
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.black,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Enter your E-mail";
-                      }
-                      return null;
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter your E-mail";
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 15, right: 25, left: 25),
+              child: TextFormField(
+                controller: _passwordTextController,
+                obscureText: obscuredText,
+                decoration: InputDecoration(
+                  focusColor: const Color(0xff62B01E),
+                  errorStyle: const TextStyle(color: Colors.red),
+                  errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.red),
+                      borderRadius: BorderRadius.circular(15)),
+                  border: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Color(0xff62B01E)),
+                      borderRadius: BorderRadius.circular(15)),
+                  labelText: "Enter your Password",
+                  prefixIcon: const Icon(Icons.password_outlined,
+                      color: Colors.black),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        obscuredText
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility,
+                        color: Colors.black),
+                    onPressed: () {
+                      setState(() {
+                        obscuredText = !obscuredText;
+                      });
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15, right: 25, left: 25),
-                  child: TextFormField(
-                    controller: _passwordTextController,
-                    obscureText: obscuredText,
-                    decoration: InputDecoration(
-                      focusColor: const Color(0xff62B01E),
-                      errorStyle: const TextStyle(color: Colors.red),
-                      errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.red),
-                          borderRadius: BorderRadius.circular(15)),
-                      border: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xff62B01E)),
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Enter your Password",
-                      prefixIcon: const Icon(Icons.password_outlined,
-                          color: Colors.black),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                            obscuredText
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility,
-                            color: Colors.black),
-                        onPressed: () {
-                          setState(() {
-                            obscuredText = !obscuredText;
-                          });
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Enter Your Password";
-                      }
-                      return null;
-                    },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter Your Password";
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 28.0),
+                    child: Text("Forgotten password,"),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 28.0),
-                        child: Text("Forgotten password,"),
+                  InkWell(
+                      child: const Text(
+                        "Reset Password?",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      InkWell(
-                          child: const Text(
-                            "Reset Password?",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()));
+                      }),
+                ],
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 30.0, right: 25, left: 25),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.grey,
+                              blurRadius: 5,
+                              blurStyle: BlurStyle.outer,
                             ),
-                            textAlign: TextAlign.start,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()));
-                          }),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 10.0, right: 25, left: 25),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 5,
-                                  blurStyle: BlurStyle.outer,
-                                ),
-                              ],
-                            ),
-                            child: CupertinoButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  try {
-                                    final user = await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                      email: _phoneTextController.text,
-                                      password: _passwordTextController.text,
-                                    )
-                                        .then((user) async {
-                                      final role = await FirebaseFirestore
-                                          .instance
+                          ],
+                        ),
+                        child: CupertinoButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                final user = await FirebaseAuth.instance
+                                    .signInWithEmailAndPassword(
+                                  email: _phoneTextController.text,
+                                  password: _passwordTextController.text,
+                                )
+                                    .then((user) async {
+                                  final role = await FirebaseFirestore
+                                      .instance
+                                      .collection('Users')
+                                      .doc(user.user?.uid)
+                                      .get()
+                                      .then((doc) => doc.data()?['role']);
+                                  final uId = FirebaseAuth
+                                      .instance.currentUser?.uid;
+
+                                  final profileStatus =
+                                      await FirebaseFirestore.instance
                                           .collection('Users')
                                           .doc(user.user?.uid)
                                           .get()
-                                          .then((doc) => doc.data()?['role']);
-                                      final uId = FirebaseAuth
-                                          .instance.currentUser?.uid;
+                                          .then((doc) =>
+                                              doc.data()?['isComplete']);
 
-                                      final profileStatus =
-                                          await FirebaseFirestore.instance
-                                              .collection('Users')
-                                              .doc(user.user?.uid)
-                                              .get()
-                                              .then((doc) =>
-                                                  doc.data()?['isComplete']);
-
-                                      if (role == 'Student' &&
-                                          profileStatus == true) {
-                                        DateTime date = DateTime.now();
-                                        String formattedYear = DateFormat('yyyy').format(date);
-                                        String formattedMonth = DateFormat('MMMM').format(date);
-                                        String formattedDay = DateFormat('d').format(date);
-                                        //String monthNow = fetchMonth(format);
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => StudentDashboardScreen(
-                                                  formattedYear: formattedYear, formattedMonth: formattedMonth,formattedDay:formattedDay)),
-                                        );
-                                      } else if (role == 'Student' &&
-                                          profileStatus == false) {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProfileCreationScreen(
-                                                    userEmail:
-                                                        _phoneTextController
-                                                            .text,
-                                                  )),
-                                          (route) => false,
-                                        );
-                                      } else if (role == 'Admin') {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AdminDashboardScreen()),
-                                        );
-                                      }
-                                    });
-                                  } on FirebaseAuthException catch (e) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text('Login Failed'),
-                                        content:
-                                            Text('Login failed: ${e.message}'),
-                                        actions: [
-                                          TextButton(
-                                            child: const Text('OK'),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                          ),
-                                        ],
-                                      ),
+                                  if (role == 'Student' &&
+                                      profileStatus == true) {
+                                    DateTime date = DateTime.now();
+                                    String formattedYear = DateFormat('yyyy').format(date);
+                                    String formattedMonth = DateFormat('MMMM').format(date);
+                                    String formattedDay = DateFormat('d').format(date);
+                                    //String monthNow = fetchMonth(format);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => StudentDashboardScreen(
+                                              formattedYear: formattedYear, formattedMonth: formattedMonth,formattedDay:formattedDay)),
+                                    );
+                                  } else if (role == 'Student' &&
+                                      profileStatus == false) {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProfileCreationScreen(
+                                                userEmail:
+                                                    _phoneTextController
+                                                        .text,
+                                              )),
+                                      (route) => false,
+                                    );
+                                  } else if (role == 'Admin') {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AdminDashboardScreen()),
                                     );
                                   }
-                                }
-                              },
-                              color: const Color(0xff62B01E),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(15)),
-                              pressedOpacity: 0.3,
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 25,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ))
-                                  : const Text(
-                                      'LOG IN',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                            ),
+                                });
+                              } on FirebaseAuthException catch (e) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Login Failed'),
+                                    content:
+                                        Text('Login failed: ${e.message}'),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          color: const Color(0xff62B01E),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(15)),
+                          pressedOpacity: 0.3,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 25,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ))
+                              : const Text(
+                                  'LOG IN',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 5,
+                                  blurStyle: BlurStyle.outer)
+                            ]),
+                        child: CupertinoButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RegistrationScreen()));
+                          },
+                          color: const Color(0xff62B01E),
+                          borderRadius: BorderRadius.circular(15),
+                          pressedOpacity: 0.3,
+                          child: const Text(
+                            'Create New Account',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 5,
-                                      blurStyle: BlurStyle.outer)
-                                ]),
-                            child: CupertinoButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const RegistrationScreen()));
-                              },
-                              color: const Color(0xff62B01E),
-                              borderRadius: BorderRadius.circular(15),
-                              pressedOpacity: 0.3,
-                              child: const Text(
-                                'Create New Account',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ]),
-                ),
-              ]))),
+                      ),
+                    ),
+                  ]),
+            ),
+          ])),
     ));
   }
 }

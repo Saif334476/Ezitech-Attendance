@@ -237,6 +237,10 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                           ? Colors.grey
                           : getAttendanceStatus(index) == 'Absent'
                               ? Colors.red
+                          : getAttendanceStatus(index) == 'Leave Pending'
+                          ? Colors.orangeAccent
+                          : getAttendanceStatus(index) == 'Leave'
+                          ? Colors.yellowAccent
                               : Colors.lightGreen,
                     ),
                     child: ListTile(
