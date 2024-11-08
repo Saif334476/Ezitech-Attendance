@@ -26,19 +26,20 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         body: SingleChildScrollView(
       child: Form(
           key: _formKey,
           child: Column(children: <Widget>[
             Padding(
-                padding: const EdgeInsets.only(top: 70),
-                child: Image.asset("assets/logo.webp",
-                    width: 150, height: 130)),
+                padding: const EdgeInsets.only(top: 90),
+                child:
+                    Image.asset("assets/logo.webp", width: 150, height: 130)),
             const Text(
               "Ezitech",
               style: TextStyle(
                   fontFamily: 'Courier',
-                  fontSize: 33,
+                  fontSize: 40,
                   fontWeight: FontWeight.w900,
                   color: Colors.blueGrey),
               textAlign: TextAlign.center,
@@ -54,8 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: const BorderSide(color: Colors.red),
                       borderRadius: BorderRadius.circular(15)),
                   border: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Color(0xff62B01E)),
+                      borderSide: const BorderSide(color: Color(0xff62B01E)),
                       borderRadius: BorderRadius.circular(15)),
                   labelText: "Enter your E-mail",
                   prefixIcon: const Icon(
@@ -83,12 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: const BorderSide(color: Colors.red),
                       borderRadius: BorderRadius.circular(15)),
                   border: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Color(0xff62B01E)),
+                      borderSide: const BorderSide(color: Color(0xff62B01E)),
                       borderRadius: BorderRadius.circular(15)),
                   labelText: "Enter your Password",
-                  prefixIcon: const Icon(Icons.password_outlined,
-                      color: Colors.black),
+                  prefixIcon:
+                      const Icon(Icons.password_outlined, color: Colors.black),
                   suffixIcon: IconButton(
                     icon: Icon(
                         obscuredText
@@ -138,8 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.only(top: 30.0, right: 25, left: 25),
+              padding: const EdgeInsets.only(top: 30.0, right: 25, left: 25),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -166,35 +164,40 @@ class _LoginScreenState extends State<LoginScreen> {
                                   password: _passwordTextController.text,
                                 )
                                     .then((user) async {
-                                  final role = await FirebaseFirestore
-                                      .instance
+                                  final role = await FirebaseFirestore.instance
                                       .collection('Users')
                                       .doc(user.user?.uid)
                                       .get()
                                       .then((doc) => doc.data()?['role']);
-                                  final uId = FirebaseAuth
-                                      .instance.currentUser?.uid;
+                                  final uId =
+                                      FirebaseAuth.instance.currentUser?.uid;
 
-                                  final profileStatus =
-                                      await FirebaseFirestore.instance
-                                          .collection('Users')
-                                          .doc(user.user?.uid)
-                                          .get()
-                                          .then((doc) =>
-                                              doc.data()?['isComplete']);
+                                  final profileStatus = await FirebaseFirestore
+                                      .instance
+                                      .collection('Users')
+                                      .doc(user.user?.uid)
+                                      .get()
+                                      .then((doc) => doc.data()?['isComplete']);
 
                                   if (role == 'Student' &&
                                       profileStatus == true) {
                                     DateTime date = DateTime.now();
-                                    String formattedYear = DateFormat('yyyy').format(date);
-                                    String formattedMonth = DateFormat('MMMM').format(date);
-                                    String formattedDay = DateFormat('d').format(date);
+                                    String formattedYear =
+                                        DateFormat('yyyy').format(date);
+                                    String formattedMonth =
+                                        DateFormat('MMMM').format(date);
+                                    String formattedDay =
+                                        DateFormat('d').format(date);
                                     //String monthNow = fetchMonth(format);
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => StudentDashboardScreen(
-                                              formattedYear: formattedYear, formattedMonth: formattedMonth,formattedDay:formattedDay)),
+                                          builder: (context) =>
+                                              StudentDashboardScreen(
+                                                  formattedYear: formattedYear,
+                                                  formattedMonth:
+                                                      formattedMonth,
+                                                  formattedDay: formattedDay)),
                                     );
                                   } else if (role == 'Student' &&
                                       profileStatus == false) {
@@ -204,8 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           builder: (context) =>
                                               ProfileCreationScreen(
                                                 userEmail:
-                                                    _phoneTextController
-                                                        .text,
+                                                    _phoneTextController.text,
                                               )),
                                       (route) => false,
                                     );
@@ -223,8 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     title: const Text('Login Failed'),
-                                    content:
-                                        Text('Login failed: ${e.message}'),
+                                    content: Text('Login failed: ${e.message}'),
                                     actions: [
                                       TextButton(
                                         child: const Text('OK'),
@@ -251,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               : const Text(
                                   'LOG IN',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w900,
                                       color: Colors.white),
                                 ),
                         ),
@@ -282,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             'Create New Account',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w900,
                                 color: Colors.white),
                           ),
                         ),

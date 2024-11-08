@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SetupPassword extends StatefulWidget {
   final TextEditingController emailController;
@@ -41,10 +42,10 @@ class _SetupPasswordState extends State<SetupPassword> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 100.0),
+                    padding: const EdgeInsets.only(top: 40.0),
                     child: SizedBox(
-                        height: 150,
-                        width: 150,
+                        height: 120,
+                        width: 120,
                         child: Image.asset(
                           "assets/lock1.webp",
                           color: const Color(0xff62B01E),
@@ -69,7 +70,7 @@ class _SetupPasswordState extends State<SetupPassword> {
                     ),
                   ),
                   const Padding(
-                    padding: EdgeInsets.only(top: 20.0, right: 20, left: 20),
+                    padding: EdgeInsets.only(top: 10.0, right: 20, left: 20),
                     child: Text(
                       'It must contain one Uppercase letter, combination of numbers, letters and symbols (/@#%^&*+= etc)',
                       style: TextStyle(
@@ -89,79 +90,82 @@ class _SetupPasswordState extends State<SetupPassword> {
                       padding:
                           const EdgeInsets.only(top: 40, right: 15, left: 15),
                       child: textFormField(
-                        "Create a Strong Password",
-                        Icons.lock_outline,
-                        onChanged: () {
-                          setState(() {});
-                        },
-                        controller: _passwordController,
-                        suffixIcon: IconButton(
-                          icon: Icon(obscuredTextOne
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility),
-                          onPressed: () {
-                            setState(() {
-                              obscuredTextOne = !obscuredTextOne;
-                            });
+                          "Create a Strong Password",
+                          Icons.lock_outline,
+                          onChanged: () {
+                            setState(() {});
                           },
-                        ),
-                        obscuredTextOne,
-                        keyboard: TextInputType.text,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Create Password';
-                          }
-                          String pattern =
-                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$';
-                          RegExp regex = RegExp(pattern);
-                          if (!regex.hasMatch(value)) {
-                            return 'Password must contain one special character and alphanumerics';
-                          } else {
-                            return null;
-                          }
-                        }, state: false
-                      )),
+                          controller: _passwordController,
+                          suffixIcon: IconButton(
+                            icon: Icon(obscuredTextOne
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                obscuredTextOne = !obscuredTextOne;
+                              });
+                            },
+                          ),
+                          obscuredTextOne,
+                          keyboard: TextInputType.text,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Create Password';
+                            }
+                            String pattern =
+                                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$';
+                            RegExp regex = RegExp(pattern);
+                            if (!regex.hasMatch(value)) {
+                              return 'Password must contain one special character and alphanumerics';
+                            } else {
+                              return null;
+                            }
+                          },
+                          state: false)),
                   Padding(
                     padding:
                         const EdgeInsets.only(top: 20, right: 15, left: 15),
                     child: textFormField(
-                      "Confirm Password",
-                      Icons.lock_outline,
-                      controller: _confirmPasswordController,
-                      suffixIcon: IconButton(
-                        icon: Icon(obscuredTextTwo
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility),
-                        onPressed: () {
-                          setState(() {
-                            obscuredTextTwo = !obscuredTextTwo;
-                          });
+                        "Confirm Password",
+                        Icons.lock_outline,
+                        controller: _confirmPasswordController,
+                        suffixIcon: IconButton(
+                          icon: Icon(obscuredTextTwo
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              obscuredTextTwo = !obscuredTextTwo;
+                            });
+                          },
+                        ),
+                        obscuredTextTwo,
+                        onChanged: () {
+                          setState(() {});
                         },
-                      ),
-                      obscuredTextTwo,
-                      onChanged: () {
-                        setState(() {});
-                      },
-                      keyboard: TextInputType.text,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Confirm Password';
-                        } else if (value != _passwordController.text) {
-                          return 'Passwords do not match';
-                        } else {
-                          return null;
-                        }
-                      }, state: false
-                    ),
+                        keyboard: TextInputType.text,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Confirm Password';
+                          } else if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          } else {
+                            return null;
+                          }
+                        },
+                        state: false),
                   ),
                   Padding(
                       padding:
-                          const EdgeInsets.only(top: 20.0, right: 65, left: 65),
+                          const EdgeInsets.only(top: 50.0, right: 65, left: 65),
                       child: _isLoading
                           ? const CupertinoActivityIndicator()
                           : CupertinoButton(
                               color: const Color(0xff62B01E),
-                              child: const Text("Create Account",style: TextStyle(fontWeight: FontWeight.bold),),
+                              child: const Text(
+                                "Create Account",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   setState(() {
@@ -169,6 +173,13 @@ class _SetupPasswordState extends State<SetupPassword> {
                                   });
 
                                   try {
+                                    final DateTime now = DateTime.now();
+                                    final String format =
+                                        DateFormat('d-MM-yyyy').format(now);
+                                    final String formattedMonth =
+                                    DateFormat('MMMM').format(now);
+                                    final String formattedYear =
+                                    DateFormat('yyyy').format(now);
                                     final credential = await FirebaseAuth
                                         .instance
                                         .createUserWithEmailAndPassword(
@@ -182,7 +193,19 @@ class _SetupPasswordState extends State<SetupPassword> {
                                         .set({
                                       'role': "Student",
                                       'isComplete': profileCompleted,
-                                      'Email': widget.emailController.text
+                                      'Email': widget.emailController.text,
+                                      'createdOn': format
+                                    });
+                                    await FirebaseFirestore.instance
+                                        .collection('Users')
+                                        .doc(credential.user?.uid)
+                                        .collection("attendance")
+                                        .doc('$formattedMonth-$formattedYear')
+                                        .set({
+                                      'role': "Student",
+                                      'isComplete': profileCompleted,
+                                      'Email': widget.emailController.text,
+                                      'createdOn': format
                                     });
 
                                     await credential.user!

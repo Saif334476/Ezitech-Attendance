@@ -83,8 +83,8 @@ class _SplashScreenState extends State<SplashScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-                height: 300,
-                width: 300,
+                height: 250,
+                width: 250,
                 child: Image.asset(
                   "assets/logo.webp",
                 )),
@@ -95,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
               "Ezitech",
               style: TextStyle(
                   fontFamily: 'Courier',
-                  fontSize: 55,
+                  fontSize: 60,
                   fontWeight: FontWeight.bold,
                   color: Colors.blueGrey),
               textAlign: TextAlign.center,

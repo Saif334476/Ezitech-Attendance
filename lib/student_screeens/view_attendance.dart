@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_dart/moment_dart.dart';
@@ -66,7 +67,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
     super.initState();
     _selectedMonth = DateFormat('MMMM').format(widget.date);
     _selectedYear = DateFormat('yyyy').format(widget.date);
-    final format = DateFormat('dd MM yyyy').format(widget.date);
+
     _fetchCreationDate();
     final String month = DateFormat('MM').format(widget.date);
     days = _getDaysInMonth(int.parse(_selectedYear!), int.parse(month));
@@ -75,13 +76,14 @@ class _ViewAttendanceState extends State<ViewAttendance> {
         .collection('Users')
         .doc(uId)
         .collection('attendance')
-        .doc('${_selectedMonth}-${_selectedYear}')
+        .doc('$_selectedMonth-$_selectedYear')
         .snapshots()
         .listen((snapshot) {
       setState(() {
         if (snapshot.exists) {
           _documents = snapshot.data()!;
         } else {
+          _documents = {};
           _documents?.clear();
         }
       });
@@ -113,17 +115,6 @@ class _ViewAttendanceState extends State<ViewAttendance> {
       ),
       body: Column(
         children: [
-          // const Padding(
-          //   padding: EdgeInsets.only(top: 20),
-          //   child: Text(
-          //     "Please Select Month",
-          //     style: TextStyle(
-          //         fontWeight: FontWeight.w900,
-          //         fontSize: 22,
-          //         color: Colors.black),
-          //   ),
-          // ),
-
           Padding(
             padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
             child: Row(
@@ -150,7 +141,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                         .collection('Users')
                         .doc(uId)
                         .collection('attendance')
-                        .doc('${newValue}-${_selectedYear}')
+                        .doc('$newValue-$_selectedYear')
                         .snapshots()
                         .listen((snapshot) {
                       setState(() {
@@ -190,7 +181,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                         .collection('Users')
                         .doc(uId)
                         .collection('attendance')
-                        .doc('${_selectedMonth}-${newValue}')
+                        .doc('$_selectedMonth-$newValue')
                         .snapshots()
                         .listen((snapshot) {
                       setState(() {
@@ -224,7 +215,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
           Padding(
             padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
             child: SizedBox(
-              height: 600,
+              height: MediaQuery.of(context).size.height * 0.75,
               width: MediaQuery.of(context).size.width,
               child: ListView.separated(
                 itemCount: days!,
@@ -233,22 +224,14 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: getAttendanceStatus(index) == 'N/A'
-                          ? Colors.grey
-                          : getAttendanceStatus(index) == 'Absent'
-                              ? Colors.red
-                          : getAttendanceStatus(index) == 'Leave Pending'
-                          ? Colors.orangeAccent
-                          : getAttendanceStatus(index) == 'Leave'
-                          ? Colors.yellowAccent
-                              : Colors.lightGreen,
+                      color: getAttendanceColor(index),
                     ),
                     child: ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${index + 1} ${_selectedMonth} ${_selectedYear}',
+                            '${index + 1} $_selectedMonth $_selectedYear',
                             style: const TextStyle(fontWeight: FontWeight.w900),
                           ),
                           Text(getAttendanceStatus(index),
@@ -270,5 +253,17 @@ class _ViewAttendanceState extends State<ViewAttendance> {
         ],
       ),
     );
+  }
+
+  ColorSwatch<int> getAttendanceColor(int index) {
+    return getAttendanceStatus(index) == 'N/A'
+                        ? Colors.grey
+                        : getAttendanceStatus(index) == 'Absent'
+                            ? Colors.redAccent
+                            : getAttendanceStatus(index) == 'Leave Pending'
+                                ? Colors.orangeAccent
+                                : getAttendanceStatus(index) == 'Leave'
+                                    ? Colors.yellowAccent
+                                    : Colors.lightGreen;
   }
 }
