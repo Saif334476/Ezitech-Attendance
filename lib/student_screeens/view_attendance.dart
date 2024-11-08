@@ -81,15 +81,11 @@ class _ViewAttendanceState extends State<ViewAttendance> {
       isAdmin = true;
     }
 
-    FirebaseFirestore.instance
-        .collection("Logs")
-        .doc(uId)
-        .set({
+    FirebaseFirestore.instance.collection("Logs").doc(uId).set({
       'events': FieldValue.arrayUnion([
         'Viewed Attendance at ${DateTime.now()}',
       ]),
-    },  SetOptions(merge: true));
-
+    }, SetOptions(merge: true));
 
     _selectedMonth = DateFormat('MMMM').format(widget.date);
     _selectedYear = DateFormat('yyyy').format(widget.date);
@@ -117,7 +113,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
   }
 
   String getAttendanceStatus(int index) {
-    final int month = options.indexOf(_selectedMonth!)+1;
+    final int month = options.indexOf(_selectedMonth!) + 1;
     final date = DateTime(int.parse(_selectedYear!), month, index + 1);
     final bool isPast = date.isBefore(DateTime.now());
     if (isPast) {
@@ -270,7 +266,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                                         .doc(
                                                             '$_selectedMonth-$_selectedYear')
                                                         .update({
-                                                      '${index+1}': "Present"
+                                                      '${index + 1}': "Present"
                                                     });
                                                     Navigator.pop(context);
                                                   },
@@ -292,7 +288,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                                         .doc(
                                                             '$_selectedMonth-$_selectedYear')
                                                         .update({
-                                                      '${index+1}': "Leave"
+                                                      '${index + 1}': "Leave"
                                                     });
                                                     Navigator.pop(context);
                                                   },

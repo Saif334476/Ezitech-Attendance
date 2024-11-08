@@ -88,7 +88,8 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        const StudentLogs())); // Close dialog
+                                                         StudentLogs( studentUid:
+                                                        student.id,))); // Close dialog
                                           },
                                           child: const Text("View Logs"),
                                         ),

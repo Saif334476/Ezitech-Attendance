@@ -23,13 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _phoneTextController.text = "saif334476@gmail.com";
-    _passwordTextController.text = "@Saifjutt001";
-  }
 
   @override
   Widget build(BuildContext context) {
