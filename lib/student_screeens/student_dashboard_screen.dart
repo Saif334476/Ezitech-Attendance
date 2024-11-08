@@ -328,9 +328,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                                     .collection("Leaves")
                                                     .doc()
                                                     .set({
-                                                  "studentId":uId,
-                                                  formattedDay: "Leave Pending",
-                                                  'description':descriptionController.text
+                                                  "date": DateTime.now(),
+                                                  "studentId": uId,
+                                                  "status": "Leave Pending",
+                                                  'description':
+                                                      descriptionController.text
                                                 });
                                                 setState(() {
                                                   marked = true;

@@ -26,7 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
         body: SingleChildScrollView(
       child: Form(
           key: _formKey,
@@ -143,123 +142,124 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 15),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 5,
-                              blurStyle: BlurStyle.outer,
-                            ),
-                          ],
-                        ),
-                        child: CupertinoButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                isLoading=true;
-                              });
-                              try {
-                                final user = await FirebaseAuth.instance
-                                    .signInWithEmailAndPassword(
-                                  email: _phoneTextController.text,
-                                  password: _passwordTextController.text,
-                                )
-                                    .then((user) async {
-                                  final role = await FirebaseFirestore.instance
-                                      .collection('Users')
-                                      .doc(user.user?.uid)
-                                      .get()
-                                      .then((doc) => doc.data()?['role']);
-                                  final uId =
-                                      FirebaseAuth.instance.currentUser?.uid;
-
-                                  final profileStatus = await FirebaseFirestore
-                                      .instance
-                                      .collection('Users')
-                                      .doc(user.user?.uid)
-                                      .get()
-                                      .then((doc) => doc.data()?['isComplete']);
-
-                                  if (role == 'Student' &&
-                                      profileStatus == true) {
-                                    DateTime date = DateTime.now();
-                                    String formattedYear =
-                                        DateFormat('yyyy').format(date);
-                                    String formattedMonth =
-                                        DateFormat('MMMM').format(date);
-                                    String formattedDay =
-                                        DateFormat('d').format(date);
-                                    //String monthNow = fetchMonth(format);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              StudentDashboardScreen(
-                                                  formattedYear: formattedYear,
-                                                  formattedMonth:
-                                                      formattedMonth,
-                                                  formattedDay: formattedDay)),
-                                    );
-                                  } else if (role == 'Student' &&
-                                      profileStatus == false) {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileCreationScreen(
-                                                userEmail:
-                                                    _phoneTextController.text,
-                                              )),
-                                      (route) => false,
-                                    );
-                                  } else if (role == 'Admin') {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AdminDashboardScreen()),
-                                    );
-                                  }
-                                });
-                              } on FirebaseAuthException catch (e) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Login Failed'),
-                                    content: Text('Login failed: ${e.message}'),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text('OK'),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                      ),
-                                    ],
+                      child: isLoading
+                          ? const CupertinoActivityIndicator()
+                          : Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 5,
+                                    blurStyle: BlurStyle.outer,
                                   ),
-                                );
-                              }
-                            }
-                          },
-                          color: const Color(0xff62B01E),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(15)),
-                          pressedOpacity: 0.3,
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 25,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ))
-                              : const Text(
+                                ],
+                              ),
+                              child: CupertinoButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    try {
+                                      final user = await FirebaseAuth.instance
+                                          .signInWithEmailAndPassword(
+                                        email: _phoneTextController.text,
+                                        password: _passwordTextController.text,
+                                      )
+                                          .then((user) async {
+                                        final role = await FirebaseFirestore
+                                            .instance
+                                            .collection('Users')
+                                            .doc(user.user?.uid)
+                                            .get()
+                                            .then((doc) => doc.data()?['role']);
+                                        final uId = FirebaseAuth
+                                            .instance.currentUser?.uid;
+
+                                        final profileStatus =
+                                            await FirebaseFirestore.instance
+                                                .collection('Users')
+                                                .doc(user.user?.uid)
+                                                .get()
+                                                .then((doc) =>
+                                                    doc.data()?['isComplete']);
+
+                                        if (role == 'Student' &&
+                                            profileStatus == true) {
+                                          DateTime date = DateTime.now();
+                                          String formattedYear =
+                                              DateFormat('yyyy').format(date);
+                                          String formattedMonth =
+                                              DateFormat('MMMM').format(date);
+                                          String formattedDay =
+                                              DateFormat('d').format(date);
+                                          //String monthNow = fetchMonth(format);
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    StudentDashboardScreen(
+                                                        formattedYear:
+                                                            formattedYear,
+                                                        formattedMonth:
+                                                            formattedMonth,
+                                                        formattedDay:
+                                                            formattedDay)),
+                                          );
+                                        } else if (role == 'Student' &&
+                                            profileStatus == false) {
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileCreationScreen(
+                                                      userEmail:
+                                                          _phoneTextController
+                                                              .text,
+                                                    )),
+                                            (route) => false,
+                                          );
+                                        } else if (role == 'Admin') {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const AdminDashboardScreen()),
+                                          );
+                                        }
+                                      });
+                                    } on FirebaseAuthException catch (e) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Login Failed'),
+                                          content: Text(
+                                              'Login failed: ${e.message}'),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text('OK'),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                color: const Color(0xff62B01E),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(15)),
+                                pressedOpacity: 0.3,
+                                child: const Text(
                                   'LOG IN',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       color: Colors.white),
                                 ),
-                        ),
-                      ),
+                              ),
+                            ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 15),
