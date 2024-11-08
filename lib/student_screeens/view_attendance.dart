@@ -219,98 +219,130 @@ class _ViewAttendanceState extends State<ViewAttendance> {
               ],
             ),
           ),
-          // _documents.isEmpty
-          //     ? const Center(
-          //         child:
-          //             //CircularProgressIndicator()
-          //             Text(
-          //         "No Data Found",
-          //         style: TextStyle(fontWeight: FontWeight.w900),
-          //       )) // Loading indicator while fetching
-          //     :
-          Padding(
-            padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.75,
-              width: MediaQuery.of(context).size.width,
-              child: ListView.separated(
-                itemCount: days!,
-                itemBuilder: (context, index) {
-                  var docData = _documents?[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: getAttendanceColor(index),
-                    ),
-                    child: ListTile(
-                      onLongPress: isAdmin
-                          ? () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          CupertinoButton(
-                                            color: const Color(0xff62B01E),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child:
-                                                const Text("Mark as Present"),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          CupertinoButton(
-                                            color: const Color(0xff62B01E),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Mark as Absent"),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          CupertinoButton(
-                                            color: const Color(0xff62B01E),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child:
-                                                const Text("Mark as On Leave"),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
-                            }
-                          : null,
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${index + 1} $_selectedMonth $_selectedYear',
-                            style: const TextStyle(fontWeight: FontWeight.w900),
+          _documents!.isEmpty
+              ? const Center(
+                  child: Text(
+                  "No Data Found",
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ))
+              : Padding(
+                  padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.75,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.separated(
+                      itemCount: days!,
+                      itemBuilder: (context, index) {
+                        // var docData = _documents?[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: getAttendanceColor(index),
                           ),
-                          Text(getAttendanceStatus(index),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w900)),
-                        ],
-                      ),
+                          child: ListTile(
+                            onLongPress: isAdmin
+                                ? () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                CupertinoButton(
+                                                  color:
+                                                      const Color(0xff62B01E),
+                                                  onPressed: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection("Users")
+                                                        .doc(uId)
+                                                        .collection(
+                                                            "attendance")
+                                                        .doc(
+                                                            '$_selectedMonth-$_selectedYear')
+                                                        .update({
+                                                      '${index}': "Present"
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text(
+                                                      "Mark as Present"),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                CupertinoButton(
+                                                  color:
+                                                      const Color(0xff62B01E),
+                                                  onPressed: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection("Users")
+                                                        .doc(uId)
+                                                        .collection(
+                                                            "attendance")
+                                                        .doc(
+                                                            '$_selectedMonth-$_selectedYear')
+                                                        .update({
+                                                      '${index}': "Leave"
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text(
+                                                      "Mark as Leave"),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                CupertinoButton(
+                                                  color:
+                                                      const Color(0xff62B01E),
+                                                  onPressed: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection("Users")
+                                                        .doc(uId)
+                                                        .collection(
+                                                            "attendance")
+                                                        .doc(
+                                                            '$_selectedMonth-$_selectedYear')
+                                                        .update({
+                                                      '${index + 1}': FieldValue
+                                                          .delete(), // This deletes the field
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text("Delete"),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  }
+                                : null,
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${index + 1} $_selectedMonth $_selectedYear',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w900),
+                                ),
+                                Text(getAttendanceStatus(index),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w900)),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          height: 10,
+                        );
+                      },
                     ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 10,
-                  );
-                },
-              ),
-            ),
-          ),
+                  ),
+                ),
         ],
       ),
     );
