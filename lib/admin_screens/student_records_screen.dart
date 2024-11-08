@@ -61,7 +61,7 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                 color: Color(0xff62B01E))
                           ]),
                       child: ListTile(
-                          onLongPress: () {
+                          onTap: () {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
