@@ -232,9 +232,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                     .doc(uId)
                                     .collection("attendance")
                                     .doc('$formattedMonth-$formattedYear')
-                                    .update({
+                                    .set({
                                   formattedDay: "Present",
-                                });
+                                },SetOptions(merge: true));
 
                                 setState(() {
                                   marked = true;
@@ -344,9 +344,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                                     .collection("attendance")
                                                     .doc(
                                                         '$formattedMonth-$formattedYear')
-                                                    .update({
+                                                    .set({
                                                   formattedDay: "Leave Pending",
-                                                });
+                                                },SetOptions(merge: true));
                                                 FirebaseFirestore.instance
                                                     .collection("Leaves")
                                                     .doc()
@@ -356,7 +356,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                                   "status": "Leave Pending",
                                                   'description':
                                                       descriptionController.text
-                                                });
+                                                },SetOptions(merge: true));
                                                 setState(() {
                                                   marked = true;
                                                 });

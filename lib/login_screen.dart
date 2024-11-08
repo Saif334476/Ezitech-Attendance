@@ -24,6 +24,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordTextController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _phoneTextController.text = "saif334476@gmail.com";
+    _passwordTextController.text = "@Saifjutt001";
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
@@ -239,8 +247,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                           actions: [
                                             TextButton(
                                               child: const Text('OK'),
-                                              onPressed: () =>
-                                                  Navigator.of(context).pop(),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                setState(() {
+                                                  isLoading=false;
+                                                });
+
+                                              }
                                             ),
                                           ],
                                         ),

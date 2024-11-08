@@ -137,6 +137,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+3"
+  firebase_app_check:
+    dependency: "direct main"
+    description:
+      name: firebase_app_check
+      sha256: "97af92ee502489b81f8c04d36747403b49885a2c4e68ad459d1919be9f303dc7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1+5"
+  firebase_app_check_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_app_check_platform_interface
+      sha256: aea7f85ec52e65d241f8fd3748193c97434edcf5bb967e80f41976db53e23b9f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0+39"
+  firebase_app_check_web:
+    dependency: transitive
+    description:
+      name: firebase_app_check_web
+      sha256: "81bc313872229b39db08a8701055f0b98090c6af873efab4bb640e8620533162"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0+1"
   firebase_auth:
     dependency: "direct main"
     description:

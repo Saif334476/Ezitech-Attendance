@@ -97,7 +97,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
     _fetchCreationDate();
     final String month = DateFormat('MM').format(widget.date);
     days = _getDaysInMonth(int.parse(_selectedYear!), int.parse(month));
-
+    _documents?.clear();
     FirebaseFirestore.instance
         .collection('Users')
         .doc(uId)
@@ -117,12 +117,9 @@ class _ViewAttendanceState extends State<ViewAttendance> {
   }
 
   String getAttendanceStatus(int index) {
-    final int month = options.indexOf(_selectedMonth!);
+    final int month = options.indexOf(_selectedMonth!)+1;
     final date = DateTime(int.parse(_selectedYear!), month, index + 1);
-    final bool isPast = date.day < DateTime.now().day;
-    if (_documents!.isEmpty) {
-      return 'N/A';
-    }
+    final bool isPast = date.isBefore(DateTime.now());
     if (isPast) {
       return _documents!['${index + 1}'] ?? 'Absent';
     }
@@ -163,6 +160,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                       days = _getDaysInMonth(int.parse(_selectedYear!),
                           options.indexOf(_selectedMonth!) + 1);
                     });
+                    _documents?.clear();
                     FirebaseFirestore.instance
                         .collection('Users')
                         .doc(uId)
@@ -229,7 +227,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
               ],
             ),
           ),
-          _documents!.isEmpty
+          _documents?.isEmpty ?? true
               ? const Center(
                   child: Text(
                   "No Data Found",

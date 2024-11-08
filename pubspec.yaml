@@ -44,7 +44,7 @@ dependencies:
   image_picker: ^0.8.5+3
   moment_dart: ^2.2.1+beta.0
   firebase_storage: ^12.3.5
-
+  firebase_app_check: ^0.3.1+5
 
 
 dev_dependencies:
