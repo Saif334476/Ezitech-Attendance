@@ -187,7 +187,7 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                                     'events': FieldValue.arrayUnion([
                                       'Profile Setup Completed ${DateTime.now()}',
                                     ]),
-                                  });
+                                  }, SetOptions(merge: true));
 
                                   Navigator.pushReplacement(
                                     context,

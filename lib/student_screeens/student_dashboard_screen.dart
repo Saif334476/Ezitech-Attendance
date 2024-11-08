@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:core';
+import 'dart:core';
 import 'package:attendence_system/login_screen.dart';
 import 'package:attendence_system/reusable_widgets.dart';
 import 'package:attendence_system/student_screeens/preview_page.dart';
@@ -104,14 +106,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("Logs")
-        .doc(uId)
-        .update({
+    FirebaseFirestore.instance.collection("Logs").doc(uId).set({
       'events': FieldValue.arrayUnion([
-        'Logged In at ${DateTime.now()}',
+        'Logged In at ${DateFormat('dd-mm-yyyy HH:mm:ss ').format(DateTime.now())}',
       ]),
-    });
+    }, SetOptions(merge: true));
     _downloadPic();
     String doc = '${widget.formattedMonth}-${widget.formattedYear}';
     checkStatus(doc);
@@ -243,11 +242,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                 FirebaseFirestore.instance
                                     .collection("Logs")
                                     .doc(uId)
-                                    .update({
+                                    .set({
                                   'events': FieldValue.arrayUnion([
                                     'Marked as Present for ${DateFormat('dd-MM-yyyy').format(DateTime.now())} at ${DateTime.now()}',
                                   ]),
-                                });
+                                }, SetOptions(merge: true));
                               },
                         child: const Text(
                           "Mark Attendance",
@@ -318,11 +317,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                                 FirebaseFirestore.instance
                                                     .collection("Logs")
                                                     .doc(uId)
-                                                    .update({
-                                                  'events': FieldValue.arrayUnion([
+                                                    .set({
+                                                  'events':
+                                                      FieldValue.arrayUnion([
                                                     'Applied Leave for ${DateFormat('dd-MM-yyyy').format(DateTime.now())} at ${DateTime.now()}',
                                                   ]),
-                                                });
+                                                }, SetOptions(merge: true));
                                                 DateTime date = DateTime.now();
                                                 final formattedMonth =
                                                     DateFormat('MMMM')
@@ -394,18 +394,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ),
                           onPressed: () {
                             final DateTime now = DateTime.now();
-                            FirebaseFirestore.instance
-                                .collection("Logs")
-                                .doc(uId)
-                                .update({
-                              'events': FieldValue.arrayUnion([
-                                'Viewed Attendance at ${DateTime.now()}',
-                              ]),
-                            });
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewAttendance(date: now, studentUid: null,)));
+                                    builder: (context) => ViewAttendance(
+                                          date: now,
+                                          studentUid: null,
+                                        )));
                           }),
                       const SizedBox(
                         height: 20,
@@ -421,11 +416,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             FirebaseFirestore.instance
                                 .collection("Logs")
                                 .doc(uId)
-                                .update({
+                                .set({
                               'events': FieldValue.arrayUnion([
                                 'Logged out at ${DateTime.now()}',
                               ]),
-                            });
+                            }, SetOptions(merge: true));
                             await FirebaseAuth.instance.signOut();
                             Navigator.pushReplacement(
                                 context,

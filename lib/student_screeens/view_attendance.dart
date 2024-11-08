@@ -73,7 +73,6 @@ class _ViewAttendanceState extends State<ViewAttendance> {
   @override
   void initState() {
     super.initState();
-
     if (widget.studentUid == null) {
       uId = FirebaseAuth.instance.currentUser!.uid;
       isAdmin = false;
@@ -81,6 +80,17 @@ class _ViewAttendanceState extends State<ViewAttendance> {
       uId = widget.studentUid!;
       isAdmin = true;
     }
+
+    FirebaseFirestore.instance
+        .collection("Logs")
+        .doc(uId)
+        .set({
+      'events': FieldValue.arrayUnion([
+        'Viewed Attendance at ${DateTime.now()}',
+      ]),
+    },  SetOptions(merge: true));
+
+
     _selectedMonth = DateFormat('MMMM').format(widget.date);
     _selectedYear = DateFormat('yyyy').format(widget.date);
 
