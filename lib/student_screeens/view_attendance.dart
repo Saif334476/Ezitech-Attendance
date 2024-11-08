@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_dart/moment_dart.dart';
 
 class ViewAttendance extends StatefulWidget {
   final DateTime date;
-  const ViewAttendance({super.key, required this.date});
+  final String? studentUid;
+  const ViewAttendance({
+    super.key,
+    required this.date,
+    required this.studentUid,
+  });
   @override
   State<ViewAttendance> createState() => _ViewAttendanceState();
 }
@@ -33,7 +37,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
     'November',
     'December'
   ];
-  String uId = FirebaseAuth.instance.currentUser!.uid;
+  late String uId;
 
   Map<String, dynamic>? _documents;
   int _getDaysInMonth(int year, int month) {
@@ -65,6 +69,11 @@ class _ViewAttendanceState extends State<ViewAttendance> {
   @override
   void initState() {
     super.initState();
+    if (widget.studentUid == null) {
+      uId = FirebaseAuth.instance.currentUser!.uid;
+    }else{
+      uId=widget.studentUid!;
+    }
     _selectedMonth = DateFormat('MMMM').format(widget.date);
     _selectedYear = DateFormat('yyyy').format(widget.date);
 
@@ -257,13 +266,13 @@ class _ViewAttendanceState extends State<ViewAttendance> {
 
   ColorSwatch<int> getAttendanceColor(int index) {
     return getAttendanceStatus(index) == 'N/A'
-                        ? Colors.grey
-                        : getAttendanceStatus(index) == 'Absent'
-                            ? Colors.redAccent
-                            : getAttendanceStatus(index) == 'Leave Pending'
-                                ? Colors.orangeAccent
-                                : getAttendanceStatus(index) == 'Leave'
-                                    ? Colors.yellowAccent
-                                    : Colors.lightGreen;
+        ? Colors.grey
+        : getAttendanceStatus(index) == 'Absent'
+            ? Colors.redAccent
+            : getAttendanceStatus(index) == 'Leave Pending'
+                ? Colors.orangeAccent
+                : getAttendanceStatus(index) == 'Leave'
+                    ? Colors.yellowAccent
+                    : Colors.lightGreen;
   }
 }

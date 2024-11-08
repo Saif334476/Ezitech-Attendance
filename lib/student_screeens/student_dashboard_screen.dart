@@ -375,9 +375,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewAttendance(
-                                          date: now,
-                                        )));
+                                    builder: (context) => ViewAttendance(date: now, studentUid: null,)));
                           }),
                       const SizedBox(
                         height: 20,
