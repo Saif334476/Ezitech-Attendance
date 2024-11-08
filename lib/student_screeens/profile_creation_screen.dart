@@ -17,7 +17,7 @@ class ProfileCreationScreen extends StatefulWidget {
 }
 
 class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
-  final uId=FirebaseAuth.instance.currentUser!.uid;
+  final uId = FirebaseAuth.instance.currentUser!.uid;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _fatherName = TextEditingController();
   final TextEditingController _phone = TextEditingController();
@@ -41,8 +41,7 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
   Future<String?> _uploadImage(File imageFile) async {
     try {
       final storageRef = FirebaseStorage.instance.ref();
-      final imageRef = storageRef.child(
-          'profile_pictures/$uId.jpg');
+      final imageRef = storageRef.child('profile_pictures/$uId.jpg');
       final uploadTask = imageRef.putFile(imageFile);
       final snapshot = await uploadTask.whenComplete(() {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -159,7 +158,6 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                           color: const Color(0xff62B01E),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-
                               if (_selectedPhoto.isNotEmpty) {
                                 final file = File(_selectedPhoto);
 
@@ -181,6 +179,16 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                                     'isComplete': true,
                                     'profilePhotoUrl': _selectedPhoto,
                                   });
+                                  FirebaseFirestore.instance
+                                      .collection("Logs")
+                                      .doc(uId)
+                                      .set({
+                                    'AccountCreatedOn': DateTime.now(),
+                                    'events': FieldValue.arrayUnion([
+                                      'Profile Setup Completed ${DateTime.now()}',
+                                    ]),
+                                  });
+
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
