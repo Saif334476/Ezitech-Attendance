@@ -19,7 +19,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool obscuredText = true;
-  bool _isLoading = false;
+  bool isLoading = false;
   final TextEditingController _phoneTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
 
@@ -157,6 +157,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: CupertinoButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                isLoading=true;
+                              });
                               try {
                                 final user = await FirebaseAuth.instance
                                     .signInWithEmailAndPassword(
@@ -242,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(15)),
                           pressedOpacity: 0.3,
-                          child: _isLoading
+                          child: isLoading
                               ? const SizedBox(
                                   height: 20,
                                   width: 25,

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:attendence_system/login_screen.dart';
+import 'package:attendence_system/reusable_widgets.dart';
+import 'package:attendence_system/student_screeens/preview_page.dart';
 import 'package:attendence_system/student_screeens/view_attendance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../splash_screen.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   final String? formattedYear;
@@ -24,6 +28,9 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  TextEditingController descriptionController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
   late String pic;
   String? formattedDate;
   String? format;
@@ -34,6 +41,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   bool marked = false;
   Map<String, dynamic>? _documents;
   String _profilePhotoUrl = "assets/person.webp";
+  String _selectedPhoto = "";
 
   int _getDaysInMonth(int year, int month) {
     DateTime firstDayNextMonth = DateTime(year, month + 1, 1);
@@ -74,7 +82,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           .collection('Users')
           .doc(uId)
           .get(); // Get the document once
-
       if (snapshot.exists) {
         var data = snapshot.data() as Map<String, dynamic>;
         String url = data['profilePhotoUrl'] ?? "assets/person.webp";
@@ -97,6 +104,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   @override
   void initState() {
     super.initState();
+
     _downloadPic();
     String doc = '${widget.formattedMonth}-${widget.formattedYear}';
     checkStatus(doc);
@@ -108,11 +116,10 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
 
   @override
   void dispose() {
-    _timer.cancel(); // Cancel the timer when the widget is disposed
+    _timer.cancel();
     super.dispose();
   }
 
-  // Function to update the current time
   void _updateTime() {
     setState(() {
       _currentTime =
@@ -120,10 +127,18 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
     });
   }
 
+  Future<void> _pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedPhoto = pickedFile.path;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    String? pic = FirebaseAuth.instance.currentUser?.photoURL;
-
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -133,216 +148,258 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 50),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage(_profilePhotoUrl),
-                    radius: 95,
-                  ),
-                  Positioned(
-                    top: 150,
-                    bottom:
-                        0, // Position the button at the bottom of the CircleAvatar
-                    right: 20, // Position it to the right of the CircleAvatar
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: const CircleAvatar(
-                        radius: 20, // Size of the edit button
-                        backgroundColor:
-                            Color(0xff62B01E), // Background color of the button
-                        child: Icon(
-                          Icons.edit, // Edit icon
-                          color: Colors.white, // Icon color
-                          size: 20, // Icon size
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text(
-                  _currentTime,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w900, fontSize: 20),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0, right: 20, left: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: Column(
+              children: [
+                Stack(
                   children: [
-                    CupertinoButton(
-                      color: marked
-                          ? CupertinoColors.inactiveGray
-                          : const Color(0xff62B01E),
-                      disabledColor: Colors.grey,
-                      onPressed: marked
-                          ? null
-                          : () {
-                              DateTime date = DateTime.now();
-                              final formattedMonth =
-                                  DateFormat('MMMM').format(date);
-                              final formattedYear =
-                                  DateFormat('yyyy').format(date);
-                              final formattedDay = DateFormat('d').format(date);
-                              formattedDate =
-                                  DateFormat('dd-MM-yyyy').format(date);
-                              format = DateFormat('MM').format(date);
-                              currentMonth = fetchMonth(format);
-                              FirebaseFirestore.instance
-                                  .collection("Users")
-                                  .doc(uId)
-                                  .collection("attendance")
-                                  .doc('$formattedMonth-$formattedYear')
-                                  .update({
-                                formattedDay: "Present",
-                              });
-
-                              setState(() {
-                                marked = true;
-                              });
-                            },
-                      child: const Text(
-                        "Mark Attendance",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 23),
-                      ),
+                    CircleAvatar(
+                      backgroundImage: _profilePhotoUrl.isNotEmpty
+                          ? NetworkImage(_profilePhotoUrl)
+                          : const AssetImage('assets/person.webp'),
+                      radius: 100,
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CupertinoButton(
-                      color: marked
-                          ? CupertinoColors.inactiveGray
-                          : const Color(0xff62B01E),
-                      disabledColor: Colors.grey,
-                      onPressed: marked
-                          ? null
-                          : () {
-                              DateTime date = DateTime.now();
-                              final formattedMonth =
-                                  DateFormat('MMMM').format(date);
-                              final formattedYear =
-                                  DateFormat('yyyy').format(date);
-                              final formattedDay = DateFormat('d').format(date);
-                              formattedDate =
-                                  DateFormat('dd-MM-yyyy').format(date);
-                              format = DateFormat('MM').format(date);
-                              currentMonth = fetchMonth(format);
-                              FirebaseFirestore.instance
-                                  .collection("Users")
-                                  .doc(uId)
-                                  .collection("attendance")
-                                  .doc('$formattedMonth-$formattedYear')
-                                  .update({
-                                formattedDay: "Leave Pending",
-                              });
-
-                              setState(() {
-                                marked = true;
-                              });
-                            },
-                      child: const Text(
-                        "Request Leave",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 23),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CupertinoButton(
-                        color: const Color(0xff62B01E),
-                        child: const Text(
-                          "View",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w900, fontSize: 23),
-                        ),
-                        onPressed: () {
-                          final DateTime now = DateTime.now();
-
+                    Positioned(
+                      top: 150,
+                      bottom: 0,
+                      right: 20,
+                      child: GestureDetector(
+                        onTap: () async {
+                          await _pickImage();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ViewAttendance(
-                                        date: now,
+                                  builder: (context) => PreviewPage(
+                                        selectedPhoto: _selectedPhoto,
                                       )));
-                        }),
-                    const SizedBox(
-                      height: 20,
+                        },
+                        child: const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Color(0xff62B01E),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ),
-                    CupertinoButton(
-                        color: const Color(0xff62B01E),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    _currentTime,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w900, fontSize: 20),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 30.0, right: 20, left: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      CupertinoButton(
+                        color: marked
+                            ? CupertinoColors.inactiveGray
+                            : const Color(0xff62B01E),
+                        disabledColor: Colors.grey,
+                        onPressed: marked
+                            ? null
+                            : () {
+                                DateTime date = DateTime.now();
+                                final formattedMonth =
+                                    DateFormat('MMMM').format(date);
+                                final formattedYear =
+                                    DateFormat('yyyy').format(date);
+                                final formattedDay =
+                                    DateFormat('d').format(date);
+                                formattedDate =
+                                    DateFormat('dd-MM-yyyy').format(date);
+                                format = DateFormat('MM').format(date);
+                                currentMonth = fetchMonth(format);
+                                FirebaseFirestore.instance
+                                    .collection("Users")
+                                    .doc(uId)
+                                    .collection("attendance")
+                                    .doc('$formattedMonth-$formattedYear')
+                                    .update({
+                                  formattedDay: "Present",
+                                });
+
+                                setState(() {
+                                  marked = true;
+                                });
+                              },
                         child: const Text(
-                          "Log Out",
+                          "Mark Attendance",
                           style: TextStyle(
                               fontWeight: FontWeight.w900, fontSize: 23),
                         ),
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut();
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()));
-                        }),
-                  ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CupertinoButton(
+                        color: marked
+                            ? CupertinoColors.inactiveGray
+                            : const Color(0xff62B01E),
+                        disabledColor: Colors.grey,
+                        onPressed: marked
+                            ? null
+                            : () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Form(
+                                      key: _formKey,
+                                      child: AlertDialog(
+                                        title: const Column(
+                                          children: [
+                                            Text(
+                                              "Note:",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Color(0xff62B01E)),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  right: 10,
+                                                  left: 10,
+                                                  bottom: 10),
+                                              child: Text(
+                                                "It will be marked as Leave Pending and will be approved by admin",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Color(0xff62B01E)),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: textFormField(
+                                            "Please Enter Description",
+                                            Icons.description_outlined,
+                                            false,
+                                            state: false,
+                                            onChanged: () {},
+                                            keyboard: TextInputType.text,
+                                            controller: descriptionController,
+                                            validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return "Please Enter Description";
+                                          }
+                                          return null;
+                                        }),
+                                        actions: [
+                                          TextButton(
+                                            child: const Text('OK'),
+                                            onPressed: () {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                DateTime date = DateTime.now();
+                                                final formattedMonth =
+                                                    DateFormat('MMMM')
+                                                        .format(date);
+                                                final formattedYear =
+                                                    DateFormat('yyyy')
+                                                        .format(date);
+                                                final formattedDay =
+                                                    DateFormat('d')
+                                                        .format(date);
+                                                formattedDate =
+                                                    DateFormat('dd-MM-yyyy')
+                                                        .format(date);
+                                                format = DateFormat('MM')
+                                                    .format(date);
+                                                FirebaseFirestore.instance
+                                                    .collection("Users")
+                                                    .doc(uId)
+                                                    .collection("attendance")
+                                                    .doc(
+                                                        '$formattedMonth-$formattedYear')
+                                                    .update({
+                                                  formattedDay: "Leave Pending",
+                                                });
+                                                FirebaseFirestore.instance
+                                                    .collection("Leaves")
+                                                    .doc()
+                                                    .set({
+                                                  "studentId":uId,
+                                                  formattedDay: "Leave Pending",
+                                                  'description':descriptionController.text
+                                                });
+                                                setState(() {
+                                                  marked = true;
+                                                });
+                                                Navigator.pop(context);
+                                              }
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text('Cancel'),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                        child: const Text(
+                          "Request Leave",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 23),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CupertinoButton(
+                          color: const Color(0xff62B01E),
+                          child: const Text(
+                            "View",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 23),
+                          ),
+                          onPressed: () {
+                            final DateTime now = DateTime.now();
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ViewAttendance(
+                                          date: now,
+                                        )));
+                          }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CupertinoButton(
+                          color: const Color(0xff62B01E),
+                          child: const Text(
+                            "Log Out",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 23),
+                          ),
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginScreen()));
+                          }),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ));
   }
-}
-
-String fetchMonth(cMonth) {
-  String month = cMonth;
-  switch (month) {
-    case '1':
-      month = 'January';
-      break;
-    case '2':
-      month = 'February';
-      break;
-    case '3':
-      month = 'March';
-      break;
-    case '4':
-      month = 'April';
-      break;
-    case '5':
-      month = 'May';
-      break;
-    case '6':
-      month = 'June';
-      break;
-    case '7':
-      month = 'July';
-      break;
-    case '8':
-      month = 'August';
-      break;
-    case '9':
-      month = 'September';
-      break;
-    case '10':
-      month = 'October';
-      break;
-    case '11':
-      month = 'November';
-      break;
-    case '12':
-      month = 'December';
-      break;
-    default:
-      // Execute code if none of the cases match
-      break;
-  }
-
-  return month;
 }

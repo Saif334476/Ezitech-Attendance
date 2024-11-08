@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:attendence_system/reusable_widgets.dart';
 import 'package:attendence_system/student_screeens/student_dashboard_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +17,7 @@ class ProfileCreationScreen extends StatefulWidget {
 }
 
 class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
+  final uId=FirebaseAuth.instance.currentUser!.uid;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _fatherName = TextEditingController();
   final TextEditingController _phone = TextEditingController();
@@ -43,7 +42,7 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
     try {
       final storageRef = FirebaseStorage.instance.ref();
       final imageRef = storageRef.child(
-          'profile_pictures/${DateTime.now().millisecondsSinceEpoch}.jpg');
+          'profile_pictures/$uId.jpg');
       final uploadTask = imageRef.putFile(imageFile);
       final snapshot = await uploadTask.whenComplete(() {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -182,7 +181,6 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                                     'isComplete': true,
                                     'profilePhotoUrl': _selectedPhoto,
                                   });
-
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
