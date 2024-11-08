@@ -2,7 +2,6 @@ import 'package:attendence_system/admin_screens/student_logs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../student_screeens/view_attendance.dart';
 
 class StudentRecordsScreen extends StatefulWidget {
@@ -51,8 +50,16 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                         const EdgeInsets.only(top: 10, right: 10, left: 10),
                     child: Container(
                       decoration: BoxDecoration(
+                          border: Border.all(
+                              color: const Color(0xff62B01E), width: 2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(width: 2, color: Colors.black)),
+                          boxShadow: const [
+                            BoxShadow(
+                                spreadRadius: 0.1,
+                                blurStyle: BlurStyle.outer,
+                                blurRadius: 0.1,
+                                color: Color(0xff62B01E))
+                          ]),
                       child: ListTile(
                           onLongPress: () {
                             showDialog(
@@ -88,8 +95,10 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                         StudentLogs( studentUid:
-                                                        student.id,))); // Close dialog
+                                                        StudentLogs(
+                                                          studentUid:
+                                                              student.id,
+                                                        ))); // Close dialog
                                           },
                                           child: const Text("View Logs"),
                                         ),
