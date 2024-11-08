@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_dart/moment_dart.dart';
+
+import '../admin_screens/student_logs.dart';
 
 class ViewAttendance extends StatefulWidget {
   final DateTime date;
@@ -17,6 +20,7 @@ class ViewAttendance extends StatefulWidget {
 }
 
 class _ViewAttendanceState extends State<ViewAttendance> {
+  late final bool isAdmin;
   int? days;
   int? monthDays;
   String? _selectedMonth;
@@ -69,10 +73,13 @@ class _ViewAttendanceState extends State<ViewAttendance> {
   @override
   void initState() {
     super.initState();
+
     if (widget.studentUid == null) {
       uId = FirebaseAuth.instance.currentUser!.uid;
-    }else{
-      uId=widget.studentUid!;
+      isAdmin = false;
+    } else {
+      uId = widget.studentUid!;
+      isAdmin = true;
     }
     _selectedMonth = DateFormat('MMMM').format(widget.date);
     _selectedYear = DateFormat('yyyy').format(widget.date);
@@ -229,13 +236,58 @@ class _ViewAttendanceState extends State<ViewAttendance> {
               child: ListView.separated(
                 itemCount: days!,
                 itemBuilder: (context, index) {
-                  // var docData = _documents[index];
+                  var docData = _documents?[index];
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: getAttendanceColor(index),
                     ),
                     child: ListTile(
+                      onLongPress: isAdmin
+                          ? () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          CupertinoButton(
+                                            color: const Color(0xff62B01E),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child:
+                                                const Text("Mark as Present"),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          CupertinoButton(
+                                            color: const Color(0xff62B01E),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Mark as Absent"),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          CupertinoButton(
+                                            color: const Color(0xff62B01E),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child:
+                                                const Text("Mark as On Leave"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }
+                          : null,
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

@@ -1,5 +1,5 @@
+import 'package:attendence_system/admin_screens/student_logs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -60,21 +60,35 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                 builder: (BuildContext context) {
                                   return AlertDialog(
                                     title: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
                                         CupertinoButton(
                                           color: const Color(0xff62B01E),
                                           onPressed: () {
-                                           Navigator.push(context, MaterialPageRoute(builder: (context)=>ViewAttendance(date: DateTime.now(), studentUid: student.id,)));
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ViewAttendance(
+                                                          date: DateTime.now(),
+                                                          studentUid:
+                                                              student.id,
+                                                        )));
                                           },
                                           child: const Text("View Attendance"),
                                         ),
-                                        const SizedBox(height: 10,),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
                                         CupertinoButton(
                                           color: const Color(0xff62B01E),
                                           onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close dialog
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const StudentLogs())); // Close dialog
                                           },
                                           child: const Text("View Logs"),
                                         ),
