@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:attendence_system/reusable_widgets.dart';
 import 'package:attendence_system/student_screeens/student_dashboard_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,13 +18,40 @@ class ProfileCreationScreen extends StatefulWidget {
   State<ProfileCreationScreen> createState() => _ProfileCreationScreenState();
 }
 
-
 class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _fatherName = TextEditingController();
   final TextEditingController _phone = TextEditingController();
-  String selectedPhoto = "assets/person.webp";
+  late File pickedPhoto;
+  String _selectedPhoto = "assets/person.webp";
+  late final PickedFile picked;
+  final ImagePicker _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedPhoto = pickedFile.path;
+      });
+    }
+  }
+
+  Future<String?> _uploadImage(File imageFile) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child(
+          'profile_pictures/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final uploadTask = imageRef.putFile(imageFile);
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +64,9 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
               Stack(
                 children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage(selectedPhoto),
+                    backgroundImage: _selectedPhoto.startsWith('assets')
+                        ? AssetImage(_selectedPhoto)
+                        : FileImage(File(_selectedPhoto)) as ImageProvider,
                     radius: 100,
                   ),
                   Positioned(
@@ -44,9 +75,9 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                         0, // Position the button at the bottom of the CircleAvatar
                     right: 20, // Position it to the right of the CircleAvatar
                     child: GestureDetector(
-                      onTap: () {
-        
-                        },
+                      onTap: () async {
+                        _pickImage();
+                      },
                       child: const CircleAvatar(
                         radius: 20, // Size of the edit button
                         backgroundColor:
@@ -64,7 +95,8 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
               Form(
                 key: _formKey,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 50.0, right: 20, left: 20),
+                  padding:
+                      const EdgeInsets.only(top: 50.0, right: 20, left: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -126,26 +158,43 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
                       ),
                       CupertinoButton(
                           color: const Color(0xff62B01E),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              final uId = FirebaseAuth.instance.currentUser!.uid;
-                              FirebaseFirestore.instance
-                                  .collection("Users")
-                                  .doc(uId)
-                                  .update({
-                                'Name': _name.text,
-                                'GuardianName':_fatherName.text,
-                                'Phone':_phone.text,
-                                'isComplete':true
-                              });
-                            String? photoUrl= FirebaseAuth.instance.currentUser?.photoURL;
 
+                              if (_selectedPhoto.isNotEmpty) {
+                                final file = File(_selectedPhoto);
 
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const StudentDashboardScreen()));
+                                String? uploadedPhotoUrl =
+                                    await _uploadImage(file);
+
+                                if (uploadedPhotoUrl != null) {
+                                  _selectedPhoto = uploadedPhotoUrl;
+                                  final uId =
+                                      FirebaseAuth.instance.currentUser!.uid;
+
+                                  FirebaseFirestore.instance
+                                      .collection("Users")
+                                      .doc(uId)
+                                      .update({
+                                    'Name': _name.text,
+                                    'GuardianName': _fatherName.text,
+                                    'Phone': _phone.text,
+                                    'isComplete': true,
+                                    'profilePhotoUrl': _selectedPhoto,
+                                  });
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StudentDashboardScreen()),
+                                  );
+                                } else {
+                                  print('Failed to upload image');
+                                }
+                              } else {
+                                print('No photo selected');
+                              }
                             }
                           },
                           child: const Text(

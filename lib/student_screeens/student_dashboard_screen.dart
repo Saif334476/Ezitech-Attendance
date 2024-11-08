@@ -24,6 +24,7 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  late String pic;
   String? formattedDate;
   String? format;
   String? currentMonth;
@@ -32,6 +33,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   final uId = FirebaseAuth.instance.currentUser?.uid;
   bool marked = false;
   Map<String, dynamic>? _documents;
+  String _profilePhotoUrl = "assets/person.webp";
+
   int _getDaysInMonth(int year, int month) {
     DateTime firstDayNextMonth = DateTime(year, month + 1, 1);
     DateTime lastDayCurrentMonth =
@@ -50,25 +53,51 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       setState(() {
         if (snapshot.exists) {
           _documents = snapshot.data()!;
-print(widget.formattedDay);
           String status = _documents![widget.formattedDay];
-          if(status=="Present"|| status=="Leave Pending"){
-        setState(() {
-          marked=true;
-        });}
+          if (status == "Present" || status == "Leave Pending") {
+            setState(() {
+              marked = true;
+            });
+          }
         } else {
           setState(() {
-            marked=false;
+            marked = false;
           });
-
         }
       });
     });
   }
 
+  Future<void> _downloadPic() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(uId)
+          .get(); // Get the document once
+
+      if (snapshot.exists) {
+        var data = snapshot.data() as Map<String, dynamic>;
+        String url = data['profilePhotoUrl'] ?? "assets/person.webp";
+        setState(() {
+          _profilePhotoUrl = url;
+        });
+      } else {
+        setState(() {
+          _profilePhotoUrl = "assets/person.webp";
+        });
+      }
+    } catch (e) {
+      print('Error fetching profile picture: $e');
+      setState(() {
+        _profilePhotoUrl = "assets/person.webp";
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _downloadPic();
     String doc = '${widget.formattedMonth}-${widget.formattedYear}';
     checkStatus(doc);
     _updateTime();
@@ -110,8 +139,8 @@ print(widget.formattedDay);
             children: [
               Stack(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: AssetImage("pic!"),
+                  CircleAvatar(
+                    backgroundImage: AssetImage(_profilePhotoUrl),
                     radius: 95,
                   ),
                   Positioned(
@@ -157,12 +186,11 @@ print(widget.formattedDay);
                           ? null
                           : () {
                               DateTime date = DateTime.now();
-                              final _formattedMonth =
+                              final formattedMonth =
                                   DateFormat('MMMM').format(date);
-                              final _formattedYear =
+                              final formattedYear =
                                   DateFormat('yyyy').format(date);
-                              final _formattedday =
-                                  DateFormat('d').format(date);
+                              final formattedDay = DateFormat('d').format(date);
                               formattedDate =
                                   DateFormat('dd-MM-yyyy').format(date);
                               format = DateFormat('MM').format(date);
@@ -171,9 +199,9 @@ print(widget.formattedDay);
                                   .collection("Users")
                                   .doc(uId)
                                   .collection("attendance")
-                                  .doc('${_formattedMonth}-${_formattedYear}')
+                                  .doc('$formattedMonth-$formattedYear')
                                   .update({
-                                _formattedday: "Present",
+                                formattedDay: "Present",
                               });
 
                               setState(() {
@@ -198,12 +226,11 @@ print(widget.formattedDay);
                           ? null
                           : () {
                               DateTime date = DateTime.now();
-                              final _formattedMonth =
+                              final formattedMonth =
                                   DateFormat('MMMM').format(date);
-                              final _formattedYear =
+                              final formattedYear =
                                   DateFormat('yyyy').format(date);
-                              final _formattedday =
-                                  DateFormat('d').format(date);
+                              final formattedDay = DateFormat('d').format(date);
                               formattedDate =
                                   DateFormat('dd-MM-yyyy').format(date);
                               format = DateFormat('MM').format(date);
@@ -212,9 +239,9 @@ print(widget.formattedDay);
                                   .collection("Users")
                                   .doc(uId)
                                   .collection("attendance")
-                                  .doc('${_formattedMonth}-${_formattedYear}')
+                                  .doc('$formattedMonth-$formattedYear')
                                   .update({
-                                _formattedday: "Leave Pending",
+                                formattedDay: "Leave Pending",
                               });
 
                               setState(() {
