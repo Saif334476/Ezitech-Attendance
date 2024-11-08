@@ -262,7 +262,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                                         .doc(
                                                             '$_selectedMonth-$_selectedYear')
                                                         .update({
-                                                      '${index}': "Present"
+                                                      '${index+1}': "Present"
                                                     });
                                                     Navigator.pop(context);
                                                   },
@@ -284,7 +284,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                                         .doc(
                                                             '$_selectedMonth-$_selectedYear')
                                                         .update({
-                                                      '${index}': "Leave"
+                                                      '${index+1}': "Leave"
                                                     });
                                                     Navigator.pop(context);
                                                   },
