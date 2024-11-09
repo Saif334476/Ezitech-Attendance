@@ -1,3 +1,4 @@
+import 'package:attendence_system/admin_screens/attendance_report.dart';
 import 'package:attendence_system/admin_screens/student_logs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -57,7 +58,7 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                             BoxShadow(
                                 spreadRadius: 0.1,
                                 blurStyle: BlurStyle.outer,
-                                blurRadius: 0.1,
+                                blurRadius: 5,
                                 color: Color(0xff62B01E))
                           ]),
                       child: ListTile(
@@ -66,6 +67,7 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
+                                    backgroundColor: Colors.transparent,
                                     title: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.stretch,
@@ -73,6 +75,7 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                         CupertinoButton(
                                           color: const Color(0xff62B01E),
                                           onPressed: () {
+                                            Navigator.pop(context);
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -83,7 +86,11 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                                               student.id,
                                                         )));
                                           },
-                                          child: const Text("View Attendance"),
+                                          child: const Text(
+                                            "View Attendance",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w900),
+                                          ),
                                         ),
                                         const SizedBox(
                                           height: 10,
@@ -91,6 +98,7 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                         CupertinoButton(
                                           color: const Color(0xff62B01E),
                                           onPressed: () {
+                                            Navigator.pop(context);
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -100,7 +108,30 @@ class _StudentRecordsScreenState extends State<StudentRecordsScreen> {
                                                               student.id,
                                                         ))); // Close dialog
                                           },
-                                          child: const Text("View Logs"),
+                                          child: const Text(
+                                            "View Logs",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        CupertinoButton(
+                                          color: const Color(0xff62B01E),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const AttendanceReport())); // Close dialog
+                                          },
+                                          child: const Text(
+                                            "Generate Report",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w900),
+                                          ),
                                         ),
                                       ],
                                     ),

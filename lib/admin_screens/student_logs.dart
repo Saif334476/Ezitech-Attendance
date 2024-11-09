@@ -59,7 +59,7 @@ class _StudentLogsState extends State<StudentLogs> {
                             color: const Color(0xff62B01E), width: 2),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: const [
-                          BoxShadow(spreadRadius: 0.1, blurStyle: BlurStyle.inner,blurRadius: 0.1,color: Color(0xff62B01E))
+                          BoxShadow(spreadRadius: 0.1, blurStyle: BlurStyle.outer,blurRadius: 5,color: Color(0xff62B01E))
                         ]),
                     child: ListTile(
                       title: Text(events[index]), // Display the event log
