@@ -47,7 +47,7 @@ class _StudentLogsState extends State<StudentLogs> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.only(right: 20.0,left: 20,top: 0.5),
         child: events.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : ListView.separated(
@@ -59,7 +59,7 @@ class _StudentLogsState extends State<StudentLogs> {
                             color: const Color(0xff62B01E), width: 2),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: const [
-                          BoxShadow(spreadRadius: 0.1, blurStyle: BlurStyle.outer,blurRadius: 5,color: Color(0xff62B01E))
+                          BoxShadow(spreadRadius: 0.1, blurStyle: BlurStyle.outer,blurRadius: 1,color: Color(0xff62B01E))
                         ]),
                     child: ListTile(
                       title: Text(events[index]), // Display the event log

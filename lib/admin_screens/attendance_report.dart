@@ -1,76 +1,109 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:moment_dart/moment_dart.dart';
 
-import '../reusable_widgets.dart';
+class AttendanceScreen extends StatefulWidget {
+  final String studentUid;
 
-class AttendanceReport extends StatefulWidget {
-  const AttendanceReport({super.key});
+  const AttendanceScreen({super.key, required this.studentUid});
 
   @override
-  State<AttendanceReport> createState() => _AttendanceReportState();
+  AttendanceScreenState createState() => AttendanceScreenState();
 }
 
-class _AttendanceReportState extends State<AttendanceReport> {
-  late final bool isAdmin;
-  int? days;
-  int? monthDays;
-  String? _selectedMonth;
-  String? _selectedYear;
-  int? numberOfDays = 30;
-  List<String> yearOptions = [];
-  List<String> options = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
-  late String uId;
+class AttendanceScreenState extends State<AttendanceScreen> {
+  String? _selectedMonthYear;
+  int presentCount = 0;
+  int leaveCount = 0;
+  int absentCount = 0;
+  List<String> monthYearList = [];
 
-  Map<String, dynamic>? _documents;
-  int _getDaysInMonth(int year, int month) {
-    DateTime firstDayNextMonth = DateTime(year, month + 1, 1);
-    DateTime lastDayCurrentMonth =
-        firstDayNextMonth.subtract(const Duration(days: 1));
-    return lastDayCurrentMonth.day;
+  @override
+  void initState() {
+    super.initState();
+    _fetchAvailableMonths();
   }
 
-  _fetchCreationDate() async {
-    final DocumentSnapshot document =
-        await FirebaseFirestore.instance.collection("Users").doc(uId).get();
-    final Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-    DateFormat dateFormat = DateFormat('d-M-yyyy');
-    final String createdOn = data['createdOn'] ?? DateTime.now();
-    DateTime createdDateTime = dateFormat.parse(createdOn);
-    final Moment creationDate = Moment(createdDateTime);
-    int currentYear = Moment.now().year;
-    final yearsDiff = Moment.now().year - creationDate.year;
-    final List<String> _yearOptions = [];
-    for (int i = 0; i <= yearsDiff; i++) {
-      _yearOptions.add((currentYear--).toString());
-    }
+  Future<void> _fetchAvailableMonths() async {
+    final attendanceRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.studentUid)
+        .collection('attendance');
+
+    QuerySnapshot snapshot = await attendanceRef.get();
+    List<String> months = snapshot.docs.map((doc) => doc.id).toList();
+
     setState(() {
-      yearOptions = _yearOptions;
+      monthYearList = months;
     });
   }
 
-  String getAttendanceStatus(int index) {
-    final int month = options.indexOf(_selectedMonth!) + 1;
-    final date = DateTime(int.parse(_selectedYear!), month, index + 1);
-    final bool isPast = date.isBefore(DateTime.now());
-    if (isPast) {
-      return _documents!['${index + 1}'] ?? 'Absent';
+  int _getTotalDaysInMonth(String monthYear) {
+    final parts = monthYear.split('-');
+    final month = DateFormat('MMMM').parse(parts[0]).month;
+    final year = int.parse(parts[1]);
+
+    final lastDayOfMonth = DateTime(year, month + 1, 0);
+    return lastDayOfMonth.day;
+  }
+
+  String _getGrade(int presentDays) {
+    if (presentDays >= 26) {
+      return 'A';
+    } else if (presentDays >= 21) {
+      return 'B';
+    } else if (presentDays >= 16) {
+      return 'C';
+    } else if (presentDays >= 10) {
+      return 'D';
+    } else {
+      return 'F';
     }
-    return _documents!['${index + 1}'] ?? 'N/A';
+  }
+
+  Future<void> _generateAttendanceReport(String monthYear) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.studentUid)
+        .collection('attendance')
+        .doc(monthYear);
+
+    try {
+      DocumentSnapshot doc = await docRef.get();
+      if (doc.exists) {
+        // Reset counts
+        presentCount = 0;
+        leaveCount = 0;
+        absentCount = 0;
+
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        data.forEach((key, value) {
+          if (value == 'Present') {
+            presentCount++;
+          } else if (value == 'Leave') {
+            leaveCount++;
+          }
+        });
+
+        int totalDaysInMonth = _getTotalDaysInMonth(monthYear);
+
+        absentCount = totalDaysInMonth - (presentCount + leaveCount);
+
+        String grade = _getGrade(presentCount);
+
+        setState(() {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Grade: $grade')));
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('No attendance data found for this month.')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error fetching data: $e')));
+    }
   }
 
   @override
@@ -80,124 +113,135 @@ class _AttendanceReportState extends State<AttendanceReport> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xff62B01E),
         title: const Text(
-          "Attendance Report",
+          'Attendance Report',
           style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
-          textAlign: TextAlign.center,
         ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-                top: 20.0, left: 20, right: 20, bottom: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 2, color: const Color(0xff62B01E))),
-              child: const Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Icon(Icons.info_outline,color: Colors.redAccent,),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      "Select range below to generate report",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
+            padding: const EdgeInsets.only(top: 10.0,right: 20,left: 20),
+            child: Row(
+              children: [
+                const Text('Student ID:',
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                Text(' ${widget.studentUid}',
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+              ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            padding: const EdgeInsets.only(right: 30, left: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DropdownButton<String>(
-                  dropdownColor: const Color(0xffd3edba),
-                  icon: const Icon(
-                    Icons.calendar_month_outlined,
-                    color: Color(0xff62B01E),
+                const SizedBox(height: 20),
+                if (monthYearList.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 30, left: 30),
+                    child: DropdownButton<String>(
+                      icon: const Icon(
+                        Icons.calendar_month_outlined,
+                        color: Color(
+                          0xff62B01E,
+                        ),
+                        size: 30,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      isExpanded: true,
+                      dropdownColor: const Color(0xffa2bf88),
+                      value: _selectedMonthYear,
+                      hint: const Text('Select Month/Year'),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedMonthYear = newValue;
+                        });
+                      },
+                      items: monthYearList.map((monthYear) {
+                        return DropdownMenuItem<String>(
+                          value: monthYear,
+                          child: Text(monthYear),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                  value: _selectedMonth, // The current selected item
-                  hint: const Text(
-                    "Select Month",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ), // Placeholder text
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedMonth = newValue;
-                      days = _getDaysInMonth(int.parse(_selectedYear!),
-                          options.indexOf(_selectedMonth!) + 1);
-                    });
-                    _documents?.clear();
-                    FirebaseFirestore.instance
-                        .collection('Users')
-                        .doc(uId)
-                        .collection('attendance')
-                        .doc('$newValue-$_selectedYear')
-                        .snapshots()
-                        .listen((snapshot) {
-                      setState(() {
-                        if (snapshot.exists) {
-                          _documents = snapshot.data()!;
-                        } else {
-                          _documents?.clear();
-                        }
-                      });
-                    });
-                  },
-                  items: options.map((String option) {
-                    return DropdownMenuItem<String>(
-                      value: option,
-                      child: Text(option), // Display option text
-                    );
-                  }).toList(),
-                ),
-                DropdownButton<String>(
-                  dropdownColor: const Color(0xffd3edba),
-                  icon: const Icon(
-                    Icons.calendar_month_outlined,
-                    color: Color(0xff62B01E),
+                const SizedBox(height: 20),
+                CupertinoButton(
+                  color: const Color(
+                    0xff62B01E,
                   ),
-                  value: _selectedYear, // The current selected item
-                  hint: const Text(
-                    "Select Year",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ), // Placeholder text
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedYear = newValue;
-                      days = _getDaysInMonth(int.parse(_selectedYear!),
-                          options.indexOf(_selectedMonth!) + 1);
-                    });
-                    FirebaseFirestore.instance
-                        .collection('Users')
-                        .doc(uId)
-                        .collection('attendance')
-                        .doc('$_selectedMonth-$newValue')
-                        .snapshots()
-                        .listen((snapshot) {
-                      setState(() {
-                        if (snapshot.exists) {
-                          _documents = snapshot.data()!;
-                        } else {
-                          _documents?.clear();
-                        }
-                      });
-                    });
+                  onPressed: () {
+                    if (_selectedMonthYear != null) {
+                      _generateAttendanceReport(_selectedMonthYear!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                        'Please select a month/year',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      )));
+                    }
                   },
-                  items: yearOptions.map((String option) {
-                    return DropdownMenuItem<String>(
-                      value: option,
-                      child: Text(option), // Display option text
-                    );
-                  }).toList(),
+                  child: const Text(
+                    'Generate Report',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
                 ),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                      border:
+                          Border.all(color: const Color(0xff62B01E), width: 2),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                            spreadRadius: 0.1,
+                            blurStyle: BlurStyle.outer,
+                            blurRadius: 5,
+                            color: Color(0xff62B01E))
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            const Text('Presents: ',
+                                style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+                            Text('$presentCount',
+                                style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Text('Absents: ',
+                                style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+                            Text('$absentCount',
+                                style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Text('Leaves: ',
+                                style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+                            Text('$leaveCount',
+                                style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        if (presentCount >
+                            0) // Only show the grade if there's data
+                          Text(
+                            'Grade: ${_getGrade(presentCount)}',
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),

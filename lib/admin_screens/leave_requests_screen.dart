@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -19,7 +20,6 @@ class _LeaveRequestsScreenState extends State<LeaveRequestsScreen> {
 
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
         return data['Name'];
       } else {
         return 'Student not found';
@@ -28,6 +28,22 @@ class _LeaveRequestsScreenState extends State<LeaveRequestsScreen> {
       print("Error fetching student name: $e");
       return 'Error fetching name';
     }
+  }
+
+  String _formatedMonth(DateTime date) {
+    return DateFormat('MMMM').format(date);
+  }
+
+  String _formatedYear(DateTime date) {
+    return DateFormat('yyyy').format(date);
+  }
+
+  String _formatedDay(DateTime date) {
+    return DateFormat('d').format(date);
+  }
+
+  String _sanitizeFieldName(String fieldName) {
+    return fieldName.replaceAll(RegExp(r'[^\w\s]'), '');
   }
 
   @override
@@ -90,14 +106,17 @@ class _LeaveRequestsScreenState extends State<LeaveRequestsScreen> {
                               style: TextStyle(fontWeight: FontWeight.w900),
                             ),
                             FutureBuilder<String>(
-                              future: fetchStudentName(leaveDetails['studentId']), // Replace with actual student ID
+                              future: fetchStudentName(leaveDetails[
+                                  'studentId']), // Replace with actual student ID
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
                                   return const Text("-----");
                                 } else if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');
                                 } else if (snapshot.hasData) {
-                                  return Text(snapshot.data ?? 'No name available');
+                                  return Text(
+                                      snapshot.data ?? 'No name available');
                                 } else {
                                   return const Text('No name available');
                                 }
@@ -125,7 +144,14 @@ class _LeaveRequestsScreenState extends State<LeaveRequestsScreen> {
                               "Description: ",
                               style: TextStyle(fontWeight: FontWeight.w900),
                             ),
-                            Text(leaveDetails['description'])
+                            SizedBox(
+                              width: 200,
+                              child: Text(
+                                leaveDetails['description'],
+                                softWrap: true,
+                                overflow: TextOverflow.clip,
+                              ),
+                            )
                           ],
                         ),
                         Row(
@@ -136,6 +162,139 @@ class _LeaveRequestsScreenState extends State<LeaveRequestsScreen> {
                             ),
                             Text(leaveDetails['studentId'])
                           ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, top: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                child: CupertinoButton(
+                                  color: const Color(0xff62B01E),
+                                  child: const Text(
+                                    "Approve",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white),
+                                  ),
+                                  onPressed: () {
+                                    String month = _sanitizeFieldName(
+                                        _formatedMonth(
+                                            leaveDetails['date'].toDate()));
+                                    String year = _sanitizeFieldName(
+                                        _formatedYear(
+                                            leaveDetails['date'].toDate()));
+                                    String day = _sanitizeFieldName(
+                                        _formatedDay(
+                                            leaveDetails['date'].toDate()));
+
+                                    FirebaseFirestore.instance
+                                        .collection("Users")
+                                        .doc(leaveDetails['studentId'])
+                                        .collection("attendance")
+                                        .doc('$month-$year')
+                                        .update({day: "Leave"});
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "Leave Application Approved",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                          actions: <Widget>[
+                                            CupertinoButton(
+                                              color: const Color(0xff62B01E),
+                                              onPressed: () async {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Leaves')
+                                                    .doc(doc
+                                                        .id) // Use the document ID of the leave request
+                                                    .delete();
+                                                Navigator.of(context)
+                                                    .pop(); // Close the dialog
+                                              },
+                                              child: const Text(
+                                                "OK",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.w900),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              CupertinoButton(
+                                color: const Color(0xff62B01E),
+                                child: const Text(
+                                  "Reject",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  String month = _sanitizeFieldName(
+                                      _formatedMonth(
+                                          leaveDetails['date'].toDate()));
+                                  String year = _sanitizeFieldName(
+                                      _formatedYear(
+                                          leaveDetails['date'].toDate()));
+                                  String day = _sanitizeFieldName(_formatedDay(
+                                      leaveDetails['date'].toDate()));
+                                  FirebaseFirestore.instance
+                                      .collection("Users")
+                                      .doc(leaveDetails['studentId'])
+                                      .collection("attendance")
+                                      .doc('$month-$year')
+                                      .update({day: "Absent"});
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text(
+                                          "Leave Application Rejected",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w900),
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                            color: const Color(0xff62B01E),
+                                            onPressed: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection('Leaves')
+                                                  .doc(doc
+                                                      .id) // Use the document ID of the leave request
+                                                  .delete();
+                                              Navigator.of(context)
+                                                  .pop(); // Close the dialog
+                                            },
+                                            child: const Text(
+                                              "OK",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w900),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
